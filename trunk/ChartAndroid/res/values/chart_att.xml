@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ChartPiece">
+
+        <attr name="chartBorderColor" format="color" />
+        <attr name="chartBorderSelectedColor" format="color" />
+        <attr name="chartBorderWidth" format="dimension" />
+        <attr name="chartAnimDuration" format="integer" />
+        
+    </declare-styleable>
+
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, ChartAndroidActivity!</string>
+    <string name="app_name">ChartAndroid</string>
+    <dimen name="default_border_with">2dp</dimen>
+	<dimen name="distance_title_chart">30dp</dimen>
+</resources>

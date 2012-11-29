@@ -3,11 +3,11 @@ package com.zoostudio.chart.linechart;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Handler;
 
+import com.zoostudio.bean.MyColor;
 import com.zoostudio.bean.PieceLineData;
 
 @SuppressLint("ViewConstructor")
@@ -21,18 +21,17 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 	private boolean finishDraw;
 	private float EndX;
 	private float EndY;
-	
 
-	public PieceLineChartView(Context context, Handler handler) {
+	public PieceLineChartView(Context context, Handler handler, MyColor color) {
 		super(context);
 		paint = new Paint();
-		paint.setColor(Color.parseColor("#00914B"));
-		paint.setStrokeWidth(2);
+		paint.setColor(color.getColor());
+		paint.setStrokeWidth(1.5f);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setShadowLayer(2.5f, 0, 0, Color.GREEN);
+		paint.setShadowLayer(2f, 0, 0, color.getColor());
 		path = new Path();
 	}
 

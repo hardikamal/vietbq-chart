@@ -1,6 +1,7 @@
 package com.zoostudio.chart.linechart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,9 +14,11 @@ import android.view.View;
 
 import com.zoostudio.bean.CircleNodeData;
 import com.zoostudio.bean.LineData;
+import com.zoostudio.bean.MyColor;
 import com.zoostudio.bean.PieceLineData;
 import com.zoostudio.bean.SeriesX;
 import com.zoostudio.bean.SeriesY;
+import com.zoostudio.chart.util.ColorUtil;
 
 @SuppressLint("ViewConstructor")
 public class LineChartControllerView extends View {
@@ -36,7 +39,8 @@ public class LineChartControllerView extends View {
 	private final static float STEP[] = { 1f, 5f, 10f, 15f, 20f, 25f, 50f,
 			100f, 200f, 500f, 1000f, 5000f, 10000f, 50000f, 100000f, 500000f,
 			1000000f, 5000000f, 1000000000f, 5000000000f };
-	private ArrayList<ComponentChartView<?>> arrayComponents;
+	private ArrayList<ArrayList<ComponentChartView<?>>> chartSeriesComponents;
+	private ArrayList<LineData>[] dataSeries;
 
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
@@ -46,13 +50,13 @@ public class LineChartControllerView extends View {
 
 	private void initChart() {
 
-		arrayComponents = new ArrayList<ComponentChartView<?>>();
 		handler = new Handler();
 		chartConfig = new LineChartConfig();
 		chartData = chart.getChartData();
-
-		mMaxValue = getMax();
-		mMinValue = getMin();
+		dataSeries = chart.getChartDataSeries();
+		// mMaxValue = getMax();
+		// mMinValue = getMin();
+		getMaxMin();
 		float total = mMaxValue - mMinValue;
 		// Tinh step cua truc Y
 		for (float step : STEP) {
@@ -135,28 +139,54 @@ public class LineChartControllerView extends View {
 	}
 
 	private void genViewPieceLine() {
-		int n = chartData.size();
-		for (int i = 0; i < n - 1; i++) {
-			final PieceLineData data = new PieceLineData();
-			data.indexStart = i;
-			data.indexEnd = i + 1;
-			data.valueStart = chartData.get(i).getValue();
-			data.valueEnd = chartData.get(i + 1).getValue();
-			data.step = mNumberStep;
-			data.paddingLeft = chartConfig.paddingLeft;
-			data.paddingBottom = chartConfig.paddingBottom;
-			data.paddingRight = chartConfig.paddingRight;
-			data.paddingTop = chartConfig.paddingTop;
-			data.numberPieceXAxis = n;
-			data.numberLine = mNumberLine;
-			final PieceLineChartView piece = new PieceLineChartView(
-					getContext(), handler);
-			piece.setData(data);
+		
+		ArrayList<MyColor> colours = ColorUtil.getColor(dataSeries.length);
+		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
+		for (int j = 0; j < dataSeries.length; j++) {
+			ArrayList<LineData> chartData= dataSeries[j];
+			int n = chartData.size();
+			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
+			for (int i = 0; i < n - 1; i++) {
 
-			final CircleNodeView nodeView = new CircleNodeView(getContext());
+				final PieceLineData data = new PieceLineData();
+				data.indexStart = i;
+				data.indexEnd = i + 1;
+				data.valueStart = chartData.get(i).getValue();
+				data.valueEnd = chartData.get(i + 1).getValue();
+				data.step = mNumberStep;
+				data.paddingLeft = chartConfig.paddingLeft;
+				data.paddingBottom = chartConfig.paddingBottom;
+				data.paddingRight = chartConfig.paddingRight;
+				data.paddingTop = chartConfig.paddingTop;
+				data.numberPieceXAxis = n;
+				data.numberLine = mNumberLine;
+				final PieceLineChartView piece = new PieceLineChartView(
+						getContext(), handler, colours.get(j));
+				piece.setData(data);
+
+				final CircleNodeView nodeView = new CircleNodeView(
+						getContext(), colours.get(j));
+				final CircleNodeData nodeData = new CircleNodeData();
+				nodeData.indexStart = i;
+				nodeData.valueStart = chartData.get(i).getValue();
+				nodeData.step = mNumberStep;
+				nodeData.paddingLeft = chartConfig.paddingLeft;
+				nodeData.paddingBottom = chartConfig.paddingBottom;
+				nodeData.paddingRight = chartConfig.paddingRight;
+				nodeData.paddingTop = chartConfig.paddingTop;
+				nodeData.numberPieceXAxis = n;
+				nodeData.numberLine = mNumberLine;
+				nodeView.setData(nodeData);
+
+				arrayComponents.add(nodeView);
+				arrayComponents.add(piece);
+			}
+
+			final CircleNodeView nodeView = new CircleNodeView(getContext(),
+					colours.get(j));
 			final CircleNodeData nodeData = new CircleNodeData();
-			nodeData.indexStart = i;
-			nodeData.valueStart = chartData.get(i).getValue();
+			nodeData.indexStart = n - 1;
+			nodeData.valueStart = chartData.get(n - 1).getValue();
 			nodeData.step = mNumberStep;
 			nodeData.paddingLeft = chartConfig.paddingLeft;
 			nodeData.paddingBottom = chartConfig.paddingBottom;
@@ -165,23 +195,10 @@ public class LineChartControllerView extends View {
 			nodeData.numberPieceXAxis = n;
 			nodeData.numberLine = mNumberLine;
 			nodeView.setData(nodeData);
-
 			arrayComponents.add(nodeView);
-			arrayComponents.add(piece);
+
+			chartSeriesComponents.add(arrayComponents);
 		}
-		final CircleNodeView nodeView = new CircleNodeView(getContext());
-		final CircleNodeData nodeData = new CircleNodeData();
-		nodeData.indexStart = n - 1;
-		nodeData.valueStart = chartData.get(n - 1).getValue();
-		nodeData.step = mNumberStep;
-		nodeData.paddingLeft = chartConfig.paddingLeft;
-		nodeData.paddingBottom = chartConfig.paddingBottom;
-		nodeData.paddingRight = chartConfig.paddingRight;
-		nodeData.paddingTop = chartConfig.paddingTop;
-		nodeData.numberPieceXAxis = n;
-		nodeData.numberLine = mNumberLine;
-		nodeView.setData(nodeData);
-		arrayComponents.add(nodeView);
 	}
 
 	@Override
@@ -197,28 +214,39 @@ public class LineChartControllerView extends View {
 		chart.drawChart(canvas);
 	}
 
-	private float getMax() {
-		float max = chartData.get(0).getValue();
-		for (int i = 1, n = chartData.size(); i < n; i++) {
-			if (max < chartData.get(i).getValue()) {
-				max = chartData.get(i).getValue();
+	private void getMaxMin() {
+		mMaxValue = 0;
+		mMinValue = Float.MAX_VALUE;
+
+		float maxSeries;
+		float minSeries;
+
+		for (int i = 0, n = dataSeries.length; i < n; i++) {
+			ArrayList<LineData> data = dataSeries[i];
+			maxSeries = data.get(0).getValue();
+			minSeries = data.get(0).getValue();
+
+			for (int j = 0, m = data.size(); j < m - 1; j++) {
+				if (maxSeries < data.get(j).getValue()) {
+					maxSeries = data.get(j).getValue();
+				}
+
+				if (minSeries > data.get(j).getValue()) {
+					minSeries = data.get(j).getValue();
+				}
+			}
+			if (mMaxValue < maxSeries) {
+				mMaxValue = maxSeries;
+			}
+			if (mMinValue > minSeries) {
+				mMinValue = minSeries;
 			}
 		}
-		return max;
 	}
 
-	private float getMin() {
-		float min = chartData.get(0).getValue();
-		for (int i = 1, n = chartData.size(); i < n; i++) {
-			if (min > chartData.get(i).getValue()) {
-				min = chartData.get(i).getValue();
-			}
-		}
-		return min;
-	}
 
-	public ArrayList<ComponentChartView<?>> getComponents() {
-		return arrayComponents;
+	public ArrayList<ArrayList<ComponentChartView<?>>> getComponents() {
+		return chartSeriesComponents;
 	}
 
 }

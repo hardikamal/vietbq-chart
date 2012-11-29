@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.zoostudio.bean.ChartData;
+import com.zoostudio.chart.exception.InvalidSeriesException;
 
 public abstract class DefaultChart<T extends ChartData> {
 
@@ -48,9 +49,21 @@ public abstract class DefaultChart<T extends ChartData> {
 		canvas.drawColor(Color.WHITE);
 	}
 
-	public void setSeries(ArrayList<T>... chartDataSeries) {
+	public void setSeries(ArrayList<T>... chartDataSeries)
+			throws InvalidSeriesException {
 		mChartDataSeries = chartDataSeries;
 		this.mChartData = chartDataSeries[0];
+		validSeries();
+	}
+
+	private void validSeries() throws InvalidSeriesException {
+		if (mChartDataSeries.length == 1)
+			return;
+		for (int i = 0; i < mChartDataSeries.length - 1; i++) {
+			if (mChartDataSeries[i].size() != mChartDataSeries[i + 1].size()) {
+				throw new InvalidSeriesException();
+			}
+		}
 	}
 
 	public void setDimen(int width, int height) {

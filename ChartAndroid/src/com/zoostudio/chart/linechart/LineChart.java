@@ -41,6 +41,11 @@ public class LineChart extends DefaultChart<LineData> {
 	public ArrayList<SeriesY> seriesY;
 	public ArrayList<SeriesX> seriesX;
 	private Paint mPaintSeriesX;
+	private TYPE type;
+
+	public LineChart(LineChart.TYPE type) {
+		this.type = type;
+	}
 
 	@Override
 	protected void initVariables() {
@@ -95,6 +100,7 @@ public class LineChart extends DefaultChart<LineData> {
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ seriesX.size();
 	}
+
 
 	@Override
 	protected void drawChart(Canvas canvas) {

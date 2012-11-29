@@ -3,12 +3,12 @@ package com.zoostudio.chart.linechart;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
 import com.zoostudio.bean.CircleNodeData;
+import com.zoostudio.bean.MyColor;
 
 @SuppressLint("DrawAllocation")
 public class CircleNodeView extends ComponentChartView<CircleNodeData> {
@@ -17,6 +17,7 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 	private RectF rectF;
 	private float x, y;
 	private float radius;
+	private int color;
 
 	public CircleNodeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -26,9 +27,10 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		super(context, attrs);
 	}
 
-	public CircleNodeView(Context context) {
+	public CircleNodeView(Context context, MyColor color) {
 		super(context);
-		radius = 10f;
+		radius = 8f;
+		this.color = color.getColor();
 		initVariables();
 
 	}
@@ -47,21 +49,22 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 				/ data.numberPieceXAxis;
 
 		x = mOrginX + (distanceSeriesX * data.indexStart) + distanceSeriesX / 2;
-		
+
 		ratio = data.valueStart / data.step;
 		y = mOrginY - (ratio * distanceSeriesY);
-		
-		x = x - radius/2;
-		y = y - radius/2;
+
+		x = x - radius / 2;
+		y = y - radius / 2;
 		rectF = new RectF(x, y, x + radius, y + radius);
-//		mPaint.setShadowLayer(2f, x + radius / 2, y + radius / 2, Color.GREEN);
+		// mPaint.setShadowLayer(2f, x + radius / 2, y + radius / 2,
+		// Color.GREEN);
 	}
 
 	private void initVariables() {
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
-		mPaint.setColor(Color.BLUE);
-		mPaint.setShadowLayer(2f, 0, 0, Color.BLUE);
+		mPaint.setColor(color);
+		mPaint.setShadowLayer(2f, 0, 0,color);
 	}
 
 	@Override

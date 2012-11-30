@@ -42,7 +42,10 @@ public class LineChart extends DefaultChart<LineData> {
 	public ArrayList<SeriesX> seriesX;
 	private Paint mPaintSeriesX;
 	private TYPE type;
-
+	private int mStartOffset;
+	private int mEndOffset;
+	
+	
 	public LineChart(LineChart.TYPE type) {
 		this.type = type;
 	}
@@ -96,11 +99,17 @@ public class LineChart extends DefaultChart<LineData> {
 				Color.BLACK, TileMode.CLAMP));
 
 		// Khoang cach giua moi line
+		float size = mEndOffset - mStartOffset;
 		distanceSeriesY = (mOrginY - chartConfig.paddingTop) / numberLine;
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
-				/ seriesX.size();
+				/ size;
 	}
-
+	
+	public void updateDistanceX(){
+		float size = mEndOffset - mStartOffset;
+		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
+				/ size;
+	}
 
 	@Override
 	protected void drawChart(Canvas canvas) {
@@ -148,7 +157,7 @@ public class LineChart extends DefaultChart<LineData> {
 		float centerX;
 		float paddingRight;
 		float padding;
-		for (int i = 0, n = seriesX.size(); i < n; i++) {
+		for (int i = mStartOffset; i < mEndOffset; i++) {
 			centerX = seriesX.get(i).centerX;
 			padding = seriesX.get(i).padding;
 			paddingRight = distanceSeriesX / 2 - centerX;
@@ -175,5 +184,13 @@ public class LineChart extends DefaultChart<LineData> {
 
 	public ArrayList<SeriesY> getSeriesY() {
 		return null;
+	}
+
+	public void setStartOffset(int mStartOffset) {
+		this.mStartOffset = mStartOffset;
+	}
+
+	public void setEndOffset(int mEndOffset) {
+		this.mEndOffset = mEndOffset;
 	}
 }

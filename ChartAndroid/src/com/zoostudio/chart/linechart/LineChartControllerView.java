@@ -1,7 +1,6 @@
 package com.zoostudio.chart.linechart;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,6 +14,7 @@ import android.view.View;
 import com.zoostudio.bean.CircleNodeData;
 import com.zoostudio.bean.LineData;
 import com.zoostudio.bean.MyColor;
+import com.zoostudio.bean.PaddingChart;
 import com.zoostudio.bean.PieceLineData;
 import com.zoostudio.bean.SeriesX;
 import com.zoostudio.bean.SeriesY;
@@ -24,7 +24,7 @@ import com.zoostudio.chart.util.ColorUtil;
 public class LineChartControllerView extends View {
 	private LineChart chart;
 	private final static int MAX_LINE = 6;
-	private final static int MAX_SERIES_X = 7;
+	private final static int MAX_SERIES_X = 6;
 	private float mMaxValue;
 	private float mMinValue;
 	private float mNumberStep;
@@ -35,12 +35,17 @@ public class LineChartControllerView extends View {
 	private ArrayList<LineData> chartData;
 	private ArrayList<SeriesX> mSeriesX;
 	private ArrayList<SeriesY> mSeriesY;
+
+	private int mStartOffset;
+	private int mEndOffset;
+
 	private Handler handler;
 	private final static float STEP[] = { 1f, 5f, 10f, 15f, 20f, 25f, 50f,
 			100f, 200f, 500f, 1000f, 5000f, 10000f, 50000f, 100000f, 500000f,
 			1000000f, 5000000f, 1000000000f, 5000000000f };
 	private ArrayList<ArrayList<ComponentChartView<?>>> chartSeriesComponents;
 	private ArrayList<LineData>[] dataSeries;
+	private ArrayList<PathLineView> lineViews;
 
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
@@ -53,9 +58,8 @@ public class LineChartControllerView extends View {
 		handler = new Handler();
 		chartConfig = new LineChartConfig();
 		chartData = chart.getChartData();
+		getOffset();
 		dataSeries = chart.getChartDataSeries();
-		// mMaxValue = getMax();
-		// mMinValue = getMin();
 		getMaxMin();
 		float total = mMaxValue - mMinValue;
 		// Tinh step cua truc Y
@@ -77,6 +81,9 @@ public class LineChartControllerView extends View {
 		getSeriesX();
 		getSeriesY();
 		// Tinh step cua truc X
+
+		chart.setStartOffset(mStartOffset);
+		chart.setEndOffset(mEndOffset);
 
 		chart.seriesY = mSeriesY;
 		chart.seriesX = mSeriesX;
@@ -110,7 +117,17 @@ public class LineChartControllerView extends View {
 			mSeriesY.add(seriesY);
 			startStep += (int) mNumberStep;
 		}
-		chartConfig.paddingLeft = paddingLeft;
+		chartConfig.paddingLeft = (float) Math.ceil(paddingLeft);
+	}
+
+	private void getOffset() {
+		if (chartData.size() > MAX_SERIES_X) {
+			mEndOffset = chartData.size();
+			mStartOffset = mEndOffset - MAX_SERIES_X;
+		} else {
+			mStartOffset = 0;
+			mEndOffset = chartData.size();
+		}
 	}
 
 	private void getSeriesX() {
@@ -121,7 +138,8 @@ public class LineChartControllerView extends View {
 		Rect bounds = new Rect();
 		String strValue;
 		float paddingBottom = 0;
-		for (int i = 0, n = chartData.size(); i < n; i++) {
+
+		for (int i = 0; i < chartData.size(); i++) {
 			SeriesX seriesX = new SeriesX();
 			strValue = chartData.get(i).getTitle();
 			painText.getTextBounds(strValue, 0, strValue.length(), bounds);
@@ -139,18 +157,27 @@ public class LineChartControllerView extends View {
 	}
 
 	private void genViewPieceLine() {
-		
 		ArrayList<MyColor> colours = ColorUtil.getColor(dataSeries.length);
+		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
+		int k = 0;
 		for (int j = 0; j < dataSeries.length; j++) {
-			ArrayList<LineData> chartData= dataSeries[j];
-			int n = chartData.size();
-			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
-			for (int i = 0; i < n - 1; i++) {
+			PathLineView lineView = new PathLineView(getContext(),
+					colours.get(j));
+			lineView.setConfigLine(new PaddingChart(chartConfig.paddingLeft,
+					chartConfig.paddingTop, chartConfig.paddingBottom,
+					chartConfig.paddingRight), mNumberLine, mNumberStep);
+			lineView.setData(chartData.subList(mStartOffset, mEndOffset));
+			lineView.setVisibility(View.INVISIBLE);
+			ArrayList<LineData> chartData = dataSeries[j];
 
+			int n = mEndOffset - mStartOffset;
+			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
+			k = 0;
+			for (int i = mStartOffset; i < mEndOffset - 1; i++, k++) {
 				final PieceLineData data = new PieceLineData();
-				data.indexStart = i;
-				data.indexEnd = i + 1;
+				data.indexStart = k;
+				data.indexEnd = k + 1;
 				data.valueStart = chartData.get(i).getValue();
 				data.valueEnd = chartData.get(i + 1).getValue();
 				data.step = mNumberStep;
@@ -165,9 +192,9 @@ public class LineChartControllerView extends View {
 				piece.setData(data);
 
 				final CircleNodeView nodeView = new CircleNodeView(
-						getContext(), colours.get(j));
+						getContext(), handler, colours.get(j));
 				final CircleNodeData nodeData = new CircleNodeData();
-				nodeData.indexStart = i;
+				nodeData.indexStart = k;
 				nodeData.valueStart = chartData.get(i).getValue();
 				nodeData.step = mNumberStep;
 				nodeData.paddingLeft = chartConfig.paddingLeft;
@@ -183,10 +210,10 @@ public class LineChartControllerView extends View {
 			}
 
 			final CircleNodeView nodeView = new CircleNodeView(getContext(),
-					colours.get(j));
+					handler, colours.get(j));
 			final CircleNodeData nodeData = new CircleNodeData();
-			nodeData.indexStart = n - 1;
-			nodeData.valueStart = chartData.get(n - 1).getValue();
+			nodeData.indexStart = k;
+			nodeData.valueStart = chartData.get(mEndOffset - 1).getValue();
 			nodeData.step = mNumberStep;
 			nodeData.paddingLeft = chartConfig.paddingLeft;
 			nodeData.paddingBottom = chartConfig.paddingBottom;
@@ -198,6 +225,7 @@ public class LineChartControllerView extends View {
 			arrayComponents.add(nodeView);
 
 			chartSeriesComponents.add(arrayComponents);
+			lineViews.add(lineView);
 		}
 	}
 
@@ -223,10 +251,10 @@ public class LineChartControllerView extends View {
 
 		for (int i = 0, n = dataSeries.length; i < n; i++) {
 			ArrayList<LineData> data = dataSeries[i];
-			maxSeries = data.get(0).getValue();
-			minSeries = data.get(0).getValue();
+			maxSeries = data.get(mStartOffset).getValue();
+			minSeries = data.get(mStartOffset).getValue();
 
-			for (int j = 0, m = data.size(); j < m - 1; j++) {
+			for (int j = mStartOffset; j < mEndOffset; j++) {
 				if (maxSeries < data.get(j).getValue()) {
 					maxSeries = data.get(j).getValue();
 				}
@@ -244,9 +272,11 @@ public class LineChartControllerView extends View {
 		}
 	}
 
-
 	public ArrayList<ArrayList<ComponentChartView<?>>> getComponents() {
 		return chartSeriesComponents;
 	}
 
+	public ArrayList<PathLineView> getLines() {
+		return lineViews;
+	}
 }

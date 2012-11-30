@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RadialGradient;
+import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 
@@ -44,7 +45,14 @@ public class LineChart extends DefaultChart<LineData> {
 	private TYPE type;
 	private int mStartOffset;
 	private int mEndOffset;
-	
+
+	private RectF mRectPanelLeft;
+	private RectF mRectPanelRight;
+
+	private Paint paintPanelLeft;
+	private float mStartOffsetSeriesX;
+	private float mStartOffsetSeriesY;
+	private float padding;
 	
 	public LineChart(LineChart.TYPE type) {
 		this.type = type;
@@ -54,12 +62,20 @@ public class LineChart extends DefaultChart<LineData> {
 	protected void initVariables() {
 		mOrginX = chartConfig.paddingLeft;
 		mOrginY = mHeight - chartConfig.paddingBottom;
-
+		mStartOffsetSeriesX = mOrginX;
+		mStartOffsetSeriesY = mOrginY;
+		
+		mRectPanelLeft = new RectF(0, 0, mOrginX, mHeight);
+		mRectPanelRight = new RectF(mWidth - chartConfig.paddingRight, 0,
+				mWidth, mHeight);
 		mPathAxisX = new Path();
 		mPathAxisY = new Path();
 
 		mPathAxisX.moveTo(mOrginX, mOrginY);
 		mPathAxisY.moveTo(mOrginX, mOrginY);
+
+		paintPanelLeft = new Paint();
+		paintPanelLeft.setColor(Color.WHITE);
 
 		paintAxisX = new Paint();
 		paintAxisX.setColor(chartConfig.colorAxisX);
@@ -103,9 +119,10 @@ public class LineChart extends DefaultChart<LineData> {
 		distanceSeriesY = (mOrginY - chartConfig.paddingTop) / numberLine;
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ size;
+		padding = distanceSeriesX/2;
 	}
-	
-	public void updateDistanceX(){
+
+	public void updateDistanceX() {
 		float size = mEndOffset - mStartOffset;
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ size;
@@ -114,13 +131,22 @@ public class LineChart extends DefaultChart<LineData> {
 	@Override
 	protected void drawChart(Canvas canvas) {
 		drawLine(canvas);
+		drawSeriesX(canvas);
+		drawPanel(canvas);
 		drawAxis(canvas);
 		drawSeriesY(canvas);
-		drawSeriesX(canvas);
+		
 	}
+
+	private void drawPanel(Canvas canvas) {
+		canvas.drawRect(mRectPanelLeft, paintPanelLeft);
+		canvas.drawRect(mRectPanelRight, paintPanelLeft);
+	}
+
 	@Override
 	protected void drawBackground(Canvas canvas) {
 	}
+
 	private void drawAxis(Canvas canvas) {
 		// Ve truc X
 		canvas.drawLine(mOrginX, mOrginY, mWidth - chartConfig.paddingRight,
@@ -154,7 +180,7 @@ public class LineChart extends DefaultChart<LineData> {
 	}
 
 	private void drawSeriesX(Canvas canvas) {
-		float offset = mOrginX;
+		float offset = mStartOffsetSeriesX;
 		float centerX;
 		float paddingRight;
 		float padding;
@@ -163,10 +189,10 @@ public class LineChart extends DefaultChart<LineData> {
 			padding = seriesX.get(i).padding;
 			paddingRight = distanceSeriesX / 2 - centerX;
 			if (i > 0)
-				canvas.drawLine(offset, mOrginY, offset, mOrginY + 4,
+				canvas.drawLine(offset, mStartOffsetSeriesY, offset, mStartOffsetSeriesY + 4,
 						mPaintSeriesX);
 			canvas.drawText(seriesX.get(i).title, offset + paddingRight,
-					mOrginY + seriesX.get(i).height - padding, mPaintSeriesX);
+					mStartOffsetSeriesY + seriesX.get(i).height - padding, mPaintSeriesX);
 			offset += distanceSeriesX;
 		}
 	}
@@ -193,5 +219,9 @@ public class LineChart extends DefaultChart<LineData> {
 
 	public void setEndOffset(int mEndOffset) {
 		this.mEndOffset = mEndOffset;
+	}
+
+	public void updateSeriesX(float startOffsetX) {
+		mStartOffsetSeriesX = startOffsetX - padding;
 	}
 }

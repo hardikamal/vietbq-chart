@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -36,7 +35,10 @@ public class PathLineView extends View {
 	private float radius = 8f;
 	private ArrayList<RectF> nodes;
 	private Paint paintCircle;
-	
+	private float mStartX;
+	private float y;
+	private float x;
+
 	public PathLineView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -57,7 +59,7 @@ public class PathLineView extends View {
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setShadowLayer(1.2f, 0, 0, color.getColor());
 		path = new Path();
-		
+
 		paintCircle = new Paint();
 		paintCircle.setShadowLayer(1.2f, 0, 0, color.getColor());
 		paintCircle.setAntiAlias(true);
@@ -89,42 +91,83 @@ public class PathLineView extends View {
 		distanceSeriesX = (screenW - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ numberPieceXAxis;
 		points = new ArrayList<PointF>();
-		float x;
-		float y;
+
+		x = mOrginX + distanceSeriesX / 2;
+		mStartX = x;
 
 		for (int i = 0, n = listData.size(); i < n; i++) {
-			x = mOrginX + (distanceSeriesX * i) + distanceSeriesX / 2;
 			ratio = listData.get(i).getValue() / step;
 			y = mOrginY - (ratio * distanceSeriesY);
 			points.add(new PointF(x, y));
+			x += distanceSeriesX;
 		}
 		float xCircle, yCircle;
-		
+
 		xCircle = points.get(0).x - radius / 2;
 		yCircle = points.get(0).y - radius / 2;
 		RectF rectF0 = new RectF(xCircle, yCircle, xCircle + radius, yCircle
 				+ radius);
 		nodes.add(rectF0);
 		path.moveTo(points.get(0).x, points.get(0).y);
-		
+
 		for (int i = 1, n = points.size(); i < n; i++) {
 			xCircle = points.get(i).x - radius / 2;
 			yCircle = points.get(i).y - radius / 2;
-			RectF rectFCircle = new RectF(xCircle, yCircle, xCircle + radius, yCircle
-					+ radius);
+			RectF rectFCircle = new RectF(xCircle, yCircle, xCircle + radius,
+					yCircle + radius);
 			nodes.add(rectFCircle);
 			path.lineTo(points.get(i).x, points.get(i).y);
+
 		}
 	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawPath(path, paint);
-		for(RectF node : nodes){
+		for (RectF node : nodes) {
 			canvas.drawArc(node, 0, 360, true, paintCircle);
 		}
 	}
 
 	public void setData(List<LineData> subList) {
 		listData = subList;
+	}
+	
+	public float getStartX() {
+		return mStartX;
+	}
+	
+	public void updateLine(float mStartX) {
+		this.mStartX = mStartX;
+		x = mStartX;
+		points.clear();
+		nodes.clear();
+		path.reset();
+		for (int i = 0, n = listData.size(); i < n; i++) {
+			ratio = listData.get(i).getValue() / step;
+			y = mOrginY - (ratio * distanceSeriesY);
+			points.add(new PointF(x, y));
+			x += distanceSeriesX;
+		}
+		
+		float xCircle, yCircle;
+
+		xCircle = points.get(0).x - radius / 2;
+		yCircle = points.get(0).y - radius / 2;
+		RectF rectF0 = new RectF(xCircle, yCircle, xCircle + radius, yCircle
+				+ radius);
+		nodes.add(rectF0);
+		path.moveTo(points.get(0).x, points.get(0).y);
+
+		for (int i = 1, n = points.size(); i < n; i++) {
+			xCircle = points.get(i).x - radius / 2;
+			yCircle = points.get(i).y - radius / 2;
+			RectF rectFCircle = new RectF(xCircle, yCircle, xCircle + radius,
+					yCircle + radius);
+			nodes.add(rectFCircle);
+			path.lineTo(points.get(i).x, points.get(i).y);
+
+		}
+		invalidate();
 	}
 }

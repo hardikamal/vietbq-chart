@@ -33,15 +33,16 @@ public class LineChartControllerView extends View {
 	private LineChartConfig chartConfig;
 	private float mOrginX, mOrginY;
 
+	public enum DIRECTION {
+		RIGHT, LEFT;
+	}
+	
 	private ArrayList<LineData> chartData;
 	private ArrayList<SeriesX> mSeriesX;
 	private ArrayList<SeriesY> mSeriesY;
 
 	private int mStartOffset;
 	private int mEndOffset;
-
-	private float mX;
-	private float mY;
 
 	private Handler handler;
 	private final static float STEP[] = { 1f, 5f, 10f, 15f, 20f, 25f, 50f,
@@ -52,7 +53,13 @@ public class LineChartControllerView extends View {
 	private ArrayList<LineData>[] dataSeries;
 	private ArrayList<PathLineView> lineViews;
 	private int mAction;
-
+	private float yMove;
+	private float xMove;
+	private float startOffsetX;
+	private float mDistanceX;
+	private DIRECTION mDriection;
+	private float mLastX;
+	
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
 		chart = lineChart;
@@ -95,7 +102,6 @@ public class LineChartControllerView extends View {
 		chart.seriesX = mSeriesX;
 
 		genViewPieceLine();
-
 		chart.chartConfig = chartConfig;
 	}
 
@@ -292,11 +298,24 @@ public class LineChartControllerView extends View {
 		mAction = event.getAction();
 		switch (mAction) {
 		case MotionEvent.ACTION_DOWN:
-			break;
+			mLastX = event.getX();
+			startOffsetX = lineViews.get(0).getStartX();
+			mDistanceX = mLastX - startOffsetX;
+			return true;
 		case MotionEvent.ACTION_UP:
 			break;
 		case MotionEvent.ACTION_MOVE:
-			break;
+			xMove = event.getX();
+			startOffsetX = xMove - mDistanceX;
+			
+			if(xMove > mLastX){
+				mDriection = DIRECTION.RIGHT;
+			}
+			lineViews.get(0).updateLine(startOffsetX);
+			lineViews.get(1).updateLine(startOffsetX);
+			chart.updateSeriesX(startOffsetX);
+			invalidate();
+			return true;
 		default:
 			break;
 		}

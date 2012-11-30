@@ -98,7 +98,7 @@ public class LineChartView extends RelativeLayout implements
 
 	@Override
 	public void onFinish() {
-		int n = componentsChart.get(0).size() * 2;
+		int n = componentsChart.get(0).size() * 2;		
 		for (int i = 1; i <= n; i++) {
 			removeViewAt(1);
 		}

@@ -26,12 +26,12 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		super(context, handler);
 		paint = new Paint();
 		paint.setColor(color.getColor());
-		paint.setStrokeWidth(1.5f);
+		paint.setStrokeWidth(1.2f);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setShadowLayer(2f, 0, 0, color.getColor());
+		paint.setShadowLayer(1.2f, 0, 0, color.getColor());
 		path = new Path();
 	}
 

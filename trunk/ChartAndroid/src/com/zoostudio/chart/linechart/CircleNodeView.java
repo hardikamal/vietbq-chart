@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.AttributeSet;
 
 import com.zoostudio.bean.CircleNodeData;
@@ -27,8 +28,8 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		super(context, attrs);
 	}
 
-	public CircleNodeView(Context context, MyColor color) {
-		super(context);
+	public CircleNodeView(Context context, Handler handler, MyColor color) {
+		super(context, handler);
 		radius = 8f;
 		this.color = color.getColor();
 		initVariables();
@@ -64,27 +65,40 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
 		mPaint.setColor(color);
-		mPaint.setShadowLayer(2f, 0, 0,color);
+		mPaint.setShadowLayer(2f, 0, 0, color);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if (!startDraw)
-			return;
-		canvas.drawArc(rectF, 0, 360, true, mPaint);
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				if (null != lineListener)
-					lineListener.onDrawFinishLitener();
+		if (startDraw && !mDrawFinish) {
+			canvas.drawArc(rectF, 0, 360, true, mPaint);
+			mDrawFinish = true;
+			if (index != -1) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						lineObsever.onDrawFinishLitener();
+					}
+				}, 5);
+			} else {
+				if (null != mDrawChartListener) {
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							mDrawChartListener.onFinish();
+						}
+					});
+				}
 			}
-		}).start();
+		} else if (startDraw && mDrawFinish) {
+			canvas.drawArc(rectF, 0, 360, true, mPaint);
+		}
 	}
 
 	@Override
 	public void onDrawFinishLitener() {
 		startDraw = true;
-		postInvalidate();
+		invalidate();
 	}
 }

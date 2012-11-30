@@ -13,17 +13,17 @@ import com.zoostudio.bean.PieceLineData;
 @SuppressLint("ViewConstructor")
 public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 	private Paint paint;
-	
+
 	private float X, Y;
 	private Path path;
 	private float speedX;
 	private float speedY;
-	private boolean finishDraw;
+	private boolean finishLastDraw;
 	private float EndX;
 	private float EndY;
 
 	public PieceLineChartView(Context context, Handler handler, MyColor color) {
-		super(context);
+		super(context, handler);
 		paint = new Paint();
 		paint.setColor(color.getColor());
 		paint.setStrokeWidth(1.5f);
@@ -44,20 +44,18 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		mOrginX = data.paddingLeft;
 		mOrginY = screenH - data.paddingBottom;
 
-		distanceSeriesY = (mOrginY - data.paddingTop)
-				/ data.numberLine;
+		distanceSeriesY = (mOrginY - data.paddingTop) / data.numberLine;
 
 		distanceSeriesX = (screenW - data.paddingLeft - data.paddingRight)
 				/ data.numberPieceXAxis;
 
-		X = mOrginX + (distanceSeriesX * data.indexStart)
-				+ distanceSeriesX / 2;
+		X = mOrginX + (distanceSeriesX * data.indexStart) + distanceSeriesX / 2;
 
 		ratio = data.valueStart / data.step;
 		Y = mOrginY - (ratio * distanceSeriesY);
 
-		EndX = mOrginX + (distanceSeriesX * data.indexEnd)
-				+ distanceSeriesX / 2;
+		EndX = mOrginX + (distanceSeriesX * data.indexEnd) + distanceSeriesX
+				/ 2;
 		ratio = data.valueEnd / data.step;
 
 		EndY = mOrginY - (ratio * distanceSeriesY);
@@ -75,42 +73,44 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if (!startDraw)
-			return;
-
-		if (!finishDraw) {
-			path.lineTo(X, Y);
-			X += speedX;
-			Y += speedY;
-			if (X > EndX) {
-				speedX = X - EndX;
-				speedY = ratio * speedX;
+		if (startDraw && !mDrawFinish) {
+			if (!finishLastDraw) {
+				path.lineTo(X, Y);
 				X += speedX;
 				Y += speedY;
-				finishDraw = true;
-//				paint.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
+				if (X > EndX) {
+					speedX = X - EndX;
+					speedY = ratio * speedX;
+					X += speedX;
+					Y += speedY;
+					finishLastDraw = true;
+					// paint.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
+					canvas.drawPath(path, paint);
+					invalidate();
+					return;
+				}
 				canvas.drawPath(path, paint);
 				invalidate();
-				return;
+			} else {
+				path.lineTo(EndX, EndY);
+				canvas.drawPath(path, paint);
+				startDraw = false;
+				mDrawFinish = true;
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						lineObsever.onDrawFinishLitener();
+					}
+				}, 10);
 			}
+		} else if (mDrawFinish) {
 			canvas.drawPath(path, paint);
-			invalidate();
-		} else {
-			path.lineTo(EndX, EndY);
-			canvas.drawPath(path, paint);
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if (null != lineListener)
-						lineListener.onDrawFinishLitener();
-				}
-			}).start();
 		}
 	}
 
 	public void onDrawFinishLitener() {
 		startDraw = true;
-		postInvalidate();
+		invalidate();
 	}
 
 }

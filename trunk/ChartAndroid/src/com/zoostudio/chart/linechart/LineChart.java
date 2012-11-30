@@ -113,13 +113,14 @@ public class LineChart extends DefaultChart<LineData> {
 
 	@Override
 	protected void drawChart(Canvas canvas) {
-		drawBackground(canvas);
 		drawLine(canvas);
 		drawAxis(canvas);
 		drawSeriesY(canvas);
 		drawSeriesX(canvas);
 	}
-
+	@Override
+	protected void drawBackground(Canvas canvas) {
+	}
 	private void drawAxis(Canvas canvas) {
 		// Ve truc X
 		canvas.drawLine(mOrginX, mOrginY, mWidth - chartConfig.paddingRight,

@@ -3,6 +3,7 @@ package com.zoostudio.chart.linechart;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -60,8 +61,14 @@ public class LineChartView extends RelativeLayout implements
 		try {
 			lineChart.setSeries(dataLineChart, data1LineChart);
 			controllerLineChart = new LineChartControllerView(getContext(), lineChart);
+			View bg = new View(getContext());
+			bg.setBackgroundColor(Color.WHITE);
+			addView(bg);
 			componentsChart = controllerLineChart.getComponents();
 			linesChart = controllerLineChart.getLines();
+			for (PathLineView line : linesChart) {
+				addView(line);
+			}
 			addView(controllerLineChart);
 			int n = 0;
 			for (ArrayList<ComponentChartView<?>> item : componentsChart) {
@@ -85,9 +92,7 @@ public class LineChartView extends RelativeLayout implements
 			for (int i = 0; i <= m; i++) {
 				componentsChart.get(i).get(0).onDrawFinishLitener();
 			}
-			for (PathLineView line : linesChart) {
-				addView(line);
-			}
+			
 			componentsChart.get(m).get(n - 1)
 					.setOnDrawChartFinishListener(this);
 
@@ -99,8 +104,8 @@ public class LineChartView extends RelativeLayout implements
 	@Override
 	public void onFinish() {
 		int n = componentsChart.get(0).size() * 2;		
-		for (int i = 1; i <= n; i++) {
-			removeViewAt(1);
+		for (int i = 0; i < n; i++) {
+			removeViewAt(4);
 		}
 		for (PathLineView line : linesChart) {
 			line.setVisibility(View.VISIBLE);

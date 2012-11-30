@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.zoostudio.bean.CircleNodeData;
@@ -39,13 +40,18 @@ public class LineChartControllerView extends View {
 	private int mStartOffset;
 	private int mEndOffset;
 
+	private float mX;
+	private float mY;
+
 	private Handler handler;
 	private final static float STEP[] = { 1f, 5f, 10f, 15f, 20f, 25f, 50f,
 			100f, 200f, 500f, 1000f, 5000f, 10000f, 50000f, 100000f, 500000f,
 			1000000f, 5000000f, 1000000000f, 5000000000f };
+
 	private ArrayList<ArrayList<ComponentChartView<?>>> chartSeriesComponents;
 	private ArrayList<LineData>[] dataSeries;
 	private ArrayList<PathLineView> lineViews;
+	private int mAction;
 
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
@@ -169,10 +175,10 @@ public class LineChartControllerView extends View {
 					colours.get(j));
 			lineView.setConfigLine(new PaddingChart(chartConfig.paddingLeft,
 					chartConfig.paddingTop, chartConfig.paddingBottom,
-					chartConfig.paddingRight), mNumberLine, mNumberStep,n);
+					chartConfig.paddingRight), mNumberLine, mNumberStep, n);
 			lineView.setData(chartData.subList(mStartOffset, mEndOffset));
 			lineView.setVisibility(View.INVISIBLE);
-			
+
 			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
 			k = 0;
 			for (int i = mStartOffset; i < mEndOffset - 1; i++, k++) {
@@ -279,5 +285,21 @@ public class LineChartControllerView extends View {
 
 	public ArrayList<PathLineView> getLines() {
 		return lineViews;
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		mAction = event.getAction();
+		switch (mAction) {
+		case MotionEvent.ACTION_DOWN:
+			break;
+		case MotionEvent.ACTION_UP:
+			break;
+		case MotionEvent.ACTION_MOVE:
+			break;
+		default:
+			break;
+		}
+		return super.onTouchEvent(event);
 	}
 }

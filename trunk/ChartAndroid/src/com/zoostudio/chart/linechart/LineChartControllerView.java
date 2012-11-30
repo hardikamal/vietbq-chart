@@ -161,17 +161,18 @@ public class LineChartControllerView extends View {
 		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
 		int k = 0;
+		int n;
 		for (int j = 0; j < dataSeries.length; j++) {
+			n = mEndOffset - mStartOffset;
+			ArrayList<LineData> chartData = dataSeries[j];
 			PathLineView lineView = new PathLineView(getContext(),
 					colours.get(j));
 			lineView.setConfigLine(new PaddingChart(chartConfig.paddingLeft,
 					chartConfig.paddingTop, chartConfig.paddingBottom,
-					chartConfig.paddingRight), mNumberLine, mNumberStep);
+					chartConfig.paddingRight), mNumberLine, mNumberStep,n);
 			lineView.setData(chartData.subList(mStartOffset, mEndOffset));
 			lineView.setVisibility(View.INVISIBLE);
-			ArrayList<LineData> chartData = dataSeries[j];
-
-			int n = mEndOffset - mStartOffset;
+			
 			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
 			k = 0;
 			for (int i = mStartOffset; i < mEndOffset - 1; i++, k++) {

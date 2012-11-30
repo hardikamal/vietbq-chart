@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -23,7 +24,6 @@ public class PathLineView extends View {
 	private float distanceSeriesY;
 	private float distanceSeriesX;
 	private float ratio;
-	private int index = -1;
 	private PaddingChart chartConfig;
 	private float numberLine;
 	private float numberPieceXAxis;
@@ -32,7 +32,9 @@ public class PathLineView extends View {
 	private List<LineData> listData;
 	private ArrayList<PointF> points;
 	private float step;
-
+	private float radius = 8f;
+	private ArrayList<RectF> nodes;
+	private Paint paintCircle;
 	public PathLineView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -43,14 +45,21 @@ public class PathLineView extends View {
 
 	public PathLineView(Context context, MyColor color) {
 		super(context);
+		nodes = new ArrayList<RectF>();
 		paint = new Paint();
 		paint.setColor(color.getColor());
-		paint.setStrokeWidth(1.5f);
+		paint.setStrokeWidth(1.2f);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
+		paint.setShadowLayer(1.2f, 0, 0, color.getColor());
 		path = new Path();
+		
+		paintCircle = new Paint();
+		paintCircle.setShadowLayer(1.2f, 0, 0, color.getColor());
+		paintCircle.setAntiAlias(true);
+		paintCircle.setColor(color.getColor());
 	}
 
 	@Override
@@ -59,10 +68,11 @@ public class PathLineView extends View {
 	}
 
 	public void setConfigLine(PaddingChart paddingChart, float numberLine,
-			float step) {
+			float step, float numberPieceXAxis) {
 		this.chartConfig = paddingChart;
 		this.numberLine = numberLine;
 		this.step = step;
+		this.numberPieceXAxis = numberPieceXAxis;
 	}
 
 	@Override
@@ -70,7 +80,10 @@ public class PathLineView extends View {
 		super.onSizeChanged(w, h, oldw, oldh);
 		screenW = w;
 		screenH = h;
+		calculatePoints();
+	}
 
+	private void calculatePoints() {
 		mOrginX = chartConfig.paddingLeft;
 		mOrginY = screenH - chartConfig.paddingBottom;
 
@@ -84,18 +97,35 @@ public class PathLineView extends View {
 
 		for (int i = 0, n = listData.size(); i < n; i++) {
 			x = mOrginX + (distanceSeriesX * i) + distanceSeriesX / 2;
-
 			ratio = listData.get(i).getValue() / step;
 			y = mOrginY - (ratio * distanceSeriesY);
-
 			points.add(new PointF(x, y));
 		}
+		float xCircle, yCircle;
+		
+		xCircle = points.get(0).x - radius / 2;
+		yCircle = points.get(0).y - radius / 2;
+		RectF rectF0 = new RectF(xCircle, yCircle, xCircle + radius, yCircle
+				+ radius);
+		nodes.add(rectF0);
 		path.moveTo(points.get(0).x, points.get(0).y);
+		
+		for (int i = 1, n = points.size(); i < n; i++) {
+			xCircle = points.get(i).x - radius / 2;
+			yCircle = points.get(i).y - radius / 2;
+			RectF rectFCircle = new RectF(xCircle, yCircle, xCircle + radius, yCircle
+					+ radius);
+			nodes.add(rectFCircle);
+			path.lineTo(points.get(i).x, points.get(i).y);
+		}
 	}
 
 	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawText("OK CON DE", 100, 100, paint);
+		canvas.drawPath(path, paint);
+		for(RectF node : nodes){
+			canvas.drawArc(node, 0, 360, true, paintCircle);
+		}
 	}
 
 	public void setData(List<LineData> subList) {

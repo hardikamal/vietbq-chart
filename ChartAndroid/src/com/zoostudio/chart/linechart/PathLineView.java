@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -35,6 +36,7 @@ public class PathLineView extends View {
 	private float radius = 8f;
 	private ArrayList<RectF> nodes;
 	private Paint paintCircle;
+	
 	public PathLineView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -60,11 +62,6 @@ public class PathLineView extends View {
 		paintCircle.setShadowLayer(1.2f, 0, 0, color.getColor());
 		paintCircle.setAntiAlias(true);
 		paintCircle.setColor(color.getColor());
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
 	}
 
 	public void setConfigLine(PaddingChart paddingChart, float numberLine,
@@ -119,9 +116,8 @@ public class PathLineView extends View {
 			path.lineTo(points.get(i).x, points.get(i).y);
 		}
 	}
-
 	@Override
-	public void draw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) {
 		canvas.drawPath(path, paint);
 		for(RectF node : nodes){
 			canvas.drawArc(node, 0, 360, true, paintCircle);

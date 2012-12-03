@@ -35,6 +35,10 @@ public class LineChartView extends RelativeLayout implements
 		LineChart lineChart = new LineChart(LineChart.TYPE.DAY);
 
 		ArrayList<LineData> dataLineChart = new ArrayList<LineData>();
+		dataLineChart.add(new LineData(1500, "12/01"));
+		dataLineChart.add(new LineData(200, "12/02"));
+		dataLineChart.add(new LineData(500, "12/03"));
+		dataLineChart.add(new LineData(1500, "12/04"));
 		dataLineChart.add(new LineData(1500, "12/05"));
 		dataLineChart.add(new LineData(200, "12/06"));
 		dataLineChart.add(new LineData(500, "12/07"));
@@ -45,8 +49,19 @@ public class LineChartView extends RelativeLayout implements
 		dataLineChart.add(new LineData(850, "12/12"));
 		dataLineChart.add(new LineData(2500, "12/13"));
 		dataLineChart.add(new LineData(1520, "12/14"));
-
+		dataLineChart.add(new LineData(1500, "12/15"));
+		dataLineChart.add(new LineData(200, "12/16"));
+		dataLineChart.add(new LineData(420, "12/17"));
+		dataLineChart.add(new LineData(180, "12/18"));
+		dataLineChart.add(new LineData(850, "12/19"));
+		dataLineChart.add(new LineData(3200, "12/20"));
+		dataLineChart.add(new LineData(2900, "12/21"));
+		
 		ArrayList<LineData> data1LineChart = new ArrayList<LineData>();
+		data1LineChart.add(new LineData(1500, "12/01"));
+		data1LineChart.add(new LineData(200, "12/02"));
+		data1LineChart.add(new LineData(500, "12/03"));
+		data1LineChart.add(new LineData(1500, "12/04"));
 		data1LineChart.add(new LineData(1500, "12/05"));
 		data1LineChart.add(new LineData(200, "12/06"));
 		data1LineChart.add(new LineData(500, "12/07"));
@@ -57,7 +72,14 @@ public class LineChartView extends RelativeLayout implements
 		data1LineChart.add(new LineData(850, "12/12"));
 		data1LineChart.add(new LineData(3200, "12/13"));
 		data1LineChart.add(new LineData(2900, "12/14"));
-
+		data1LineChart.add(new LineData(1500, "12/15"));
+		data1LineChart.add(new LineData(200, "12/16"));
+		data1LineChart.add(new LineData(345, "12/17"));
+		data1LineChart.add(new LineData(143, "12/18"));
+		data1LineChart.add(new LineData(321, "12/19"));
+		data1LineChart.add(new LineData(762, "12/20"));
+		data1LineChart.add(new LineData(1287, "12/21"));
+		
 		try {
 			lineChart.setSeries(dataLineChart, data1LineChart);
 			controllerLineChart = new LineChartControllerView(getContext(), lineChart);

@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 
 import com.zoostudio.bean.CircleNodeData;
 import com.zoostudio.bean.MyColor;
+import com.zoostudio.chart.R;
 
 @SuppressLint("DrawAllocation")
 public class CircleNodeView extends ComponentChartView<CircleNodeData> {
@@ -30,7 +31,7 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 
 	public CircleNodeView(Context context, Handler handler, MyColor color) {
 		super(context, handler);
-		radius = 8f;
+		radius = getResources().getDimensionPixelSize(R.dimen.default_radius_node);
 		this.color = color.getColor();
 		initVariables();
 

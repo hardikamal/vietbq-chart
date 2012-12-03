@@ -57,10 +57,14 @@ public class PieceCircleChartView extends View implements ObserverAnimation {
 		mChart = new PieceCircleChart(config);
 		((PieceCircleChart) mChart).setCircleData(data, degree);
 	}
-
+	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		mChart.setDimen(w, h);
+	}
 	@Override
 	protected void onDraw(Canvas canvas) {
-		mChart.setDimen(getWidth(), getHeight());
 		mChart.draw(canvas);
 	}
 

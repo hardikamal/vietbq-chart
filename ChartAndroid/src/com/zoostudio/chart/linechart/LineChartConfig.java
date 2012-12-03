@@ -17,7 +17,7 @@ public class LineChartConfig {
 	int colorSeriesX;
 	int colorSeriesY;
 
-	int fontSize;
+	float fontSize;
 	int fontColor;
 
 	public LineChartConfig() {
@@ -29,7 +29,7 @@ public class LineChartConfig {
 		paddingBottom = 15;
 		paddingLeft = 40;
 		paddingTop = 15;
-		paddingRight = 15;
+		paddingRight = 55;
 		fontColor = Color.BLACK;
 		fontSize = 12;
 	}

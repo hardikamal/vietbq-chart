@@ -19,6 +19,7 @@ import com.zoostudio.bean.PaddingChart;
 import com.zoostudio.bean.PieceLineData;
 import com.zoostudio.bean.SeriesX;
 import com.zoostudio.bean.SeriesY;
+import com.zoostudio.chart.R;
 import com.zoostudio.chart.util.ColorUtil;
 
 @SuppressLint("ViewConstructor")
@@ -36,7 +37,7 @@ public class LineChartControllerView extends View {
 	public enum DIRECTION {
 		RIGHT, LEFT;
 	}
-	
+
 	private ArrayList<LineData> chartData;
 	private ArrayList<SeriesX> mSeriesX;
 	private ArrayList<SeriesY> mSeriesY;
@@ -59,18 +60,26 @@ public class LineChartControllerView extends View {
 	private float mDistanceX;
 	private DIRECTION mDriection;
 	private float mLastX;
+	private int totalSeriesX;
 	
+	private float speedDraw;
+	private float fontSize;
+	private float borderLine;
+
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
 		chart = lineChart;
+		fontSize = getResources().getDimensionPixelOffset(R.dimen.defalut_font_size);
 		initChart();
 	}
 
 	private void initChart() {
-
 		handler = new Handler();
 		chartConfig = new LineChartConfig();
+		chartConfig.fontSize = fontSize;
+		
 		chartData = chart.getChartData();
+		totalSeriesX = chartData.size();
 		getOffset();
 		dataSeries = chart.getChartDataSeries();
 		getMaxMin();
@@ -247,11 +256,13 @@ public class LineChartControllerView extends View {
 		super.onSizeChanged(w, h, oldw, oldh);
 		mOrginX = chartConfig.paddingLeft;
 		mOrginY = h - chartConfig.paddingBottom;
+		chart.setDimen(w, h);
+		chart.initVariables();
+		chart.updateSeriesX(mOrginX, true);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		chart.setDimen(getWidth(), getHeight());
 		chart.drawChart(canvas);
 	}
 
@@ -299,21 +310,38 @@ public class LineChartControllerView extends View {
 		switch (mAction) {
 		case MotionEvent.ACTION_DOWN:
 			mLastX = event.getX();
-			startOffsetX = lineViews.get(0).getStartX();
-			mDistanceX = mLastX - startOffsetX;
+			System.out.println("X= " + mLastX);
+			mDistanceX = mLastX - chart.getFirstX();
 			return true;
 		case MotionEvent.ACTION_UP:
 			break;
 		case MotionEvent.ACTION_MOVE:
 			xMove = event.getX();
 			startOffsetX = xMove - mDistanceX;
-			
-			if(xMove > mLastX){
+			if (xMove > mLastX) {
+				mLastX = xMove;
 				mDriection = DIRECTION.RIGHT;
+				if (chart.validMoveRight()) {
+					chart.updateSeriesXByRight(mOrginX);
+					mDistanceX = mLastX - chart.getFirstX();
+					invalidate();
+					return true;
+				}
+			} else if (xMove < mLastX) {
+				System.out.println("Move Left");
+				mLastX = xMove;
+				mDriection = DIRECTION.LEFT;
+				if (chart.validMoveLeft()) {
+					chart.updateSeriesXByLeft(startOffsetX);
+					mDistanceX = mLastX - chart.getFirstX();
+					invalidate();
+					return true;
+				}
 			}
-			lineViews.get(0).updateLine(startOffsetX);
-			lineViews.get(1).updateLine(startOffsetX);
-			chart.updateSeriesX(startOffsetX);
+			mLastX = xMove;
+			// lineViews.get(0).updateLine(startOffsetX);
+			// lineViews.get(1).updateLine(startOffsetX);
+			chart.updateSeriesX(startOffsetX, false);
 			invalidate();
 			return true;
 		default:

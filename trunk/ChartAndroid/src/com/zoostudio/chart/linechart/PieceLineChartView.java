@@ -9,6 +9,7 @@ import android.os.Handler;
 
 import com.zoostudio.bean.MyColor;
 import com.zoostudio.bean.PieceLineData;
+import com.zoostudio.chart.R;
 
 @SuppressLint("ViewConstructor")
 public class PieceLineChartView extends ComponentChartView<PieceLineData> {
@@ -26,12 +27,14 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		super(context, handler);
 		paint = new Paint();
 		paint.setColor(color.getColor());
-		paint.setStrokeWidth(1.2f);
+		paint.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.default_border_line));
+		speedX = getResources().getDimensionPixelSize(R.dimen.default_speed);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setShadowLayer(1.2f, 0, 0, color.getColor());
+		float boderShadow = getResources().getDimensionPixelSize(R.dimen.default_border_shader);
+		paint.setShadowLayer(boderShadow, 0, 0, color.getColor());
 		path = new Path();
 	}
 
@@ -63,7 +66,7 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		float hRect = EndY - Y;
 		float wRect = EndX - X;
 		ratio = hRect / wRect;
-		speedX = 10f;
+		
 		speedY = ratio * speedX;
 
 		path.moveTo(X, Y);

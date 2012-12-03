@@ -15,6 +15,7 @@ import android.view.View;
 import com.zoostudio.bean.LineData;
 import com.zoostudio.bean.MyColor;
 import com.zoostudio.bean.PaddingChart;
+import com.zoostudio.chart.R;
 
 public class PathLineView extends View {
 	protected OnFinishDrawLineListener lineObsever;
@@ -38,6 +39,7 @@ public class PathLineView extends View {
 	private float mStartX;
 	private float y;
 	private float x;
+	private float borderLine;
 
 	public PathLineView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -49,10 +51,11 @@ public class PathLineView extends View {
 
 	public PathLineView(Context context, MyColor color) {
 		super(context);
+		radius = getResources().getDimensionPixelSize(R.dimen.default_radius_node);
 		nodes = new ArrayList<RectF>();
 		paint = new Paint();
 		paint.setColor(color.getColor());
-		paint.setStrokeWidth(1.2f);
+		paint.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.default_border_with));
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
@@ -91,9 +94,10 @@ public class PathLineView extends View {
 		distanceSeriesX = (screenW - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ numberPieceXAxis;
 		points = new ArrayList<PointF>();
-
+		
+		mStartX = mOrginX;
 		x = mOrginX + distanceSeriesX / 2;
-		mStartX = x;
+		
 
 		for (int i = 0, n = listData.size(); i < n; i++) {
 			ratio = listData.get(i).getValue() / step;
@@ -138,7 +142,7 @@ public class PathLineView extends View {
 	}
 	
 	public void updateLine(float mStartX) {
-		this.mStartX = mStartX;
+		this.mStartX = mStartX + distanceSeriesX / 2;
 		x = mStartX;
 		points.clear();
 		nodes.clear();

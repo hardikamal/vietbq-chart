@@ -5,4 +5,9 @@
     <string name="app_name">ChartAndroid</string>
     <dimen name="default_border_with">2dp</dimen>
 	<dimen name="distance_title_chart">30dp</dimen>
+	<dimen name="default_border_shader">1.5dp</dimen>
+	<dimen name="default_border_line">2.5dp</dimen>
+	<dimen name="default_speed">12dp</dimen>
+	<dimen name="defalut_font_size">14dp</dimen>
+	<dimen name="default_radius_node">14dp</dimen>
 </resources>

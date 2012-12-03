@@ -50,10 +50,25 @@ public class LineChart extends DefaultChart<LineData> {
 	private RectF mRectPanelRight;
 
 	private Paint paintPanelLeft;
-	private float mStartOffsetSeriesX;
 	private float mStartOffsetSeriesY;
-	private float padding;
-	
+	private float aHalf;
+
+	private float boundRight;
+	private float mLastX;
+
+	/**
+	 * Tong so node tren truc X
+	 */
+	private int totalNodeX;
+
+	/**
+	 * Vi tri x cua phan tu cuoi cung trong mang
+	 */
+	private float X_LAST_POSTION;
+	private float boundLeft;
+	private float distanceX;
+	private float paddingRightText;
+
 	public LineChart(LineChart.TYPE type) {
 		this.type = type;
 	}
@@ -62,9 +77,8 @@ public class LineChart extends DefaultChart<LineData> {
 	protected void initVariables() {
 		mOrginX = chartConfig.paddingLeft;
 		mOrginY = mHeight - chartConfig.paddingBottom;
-		mStartOffsetSeriesX = mOrginX;
 		mStartOffsetSeriesY = mOrginY;
-		
+
 		mRectPanelLeft = new RectF(0, 0, mOrginX, mHeight);
 		mRectPanelRight = new RectF(mWidth - chartConfig.paddingRight, 0,
 				mWidth, mHeight);
@@ -115,11 +129,16 @@ public class LineChart extends DefaultChart<LineData> {
 				Color.BLACK, TileMode.CLAMP));
 
 		// Khoang cach giua moi line
-		float size = mEndOffset - mStartOffset;
+		totalNodeX = mEndOffset - mStartOffset;
+
 		distanceSeriesY = (mOrginY - chartConfig.paddingTop) / numberLine;
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
-				/ size;
-		padding = distanceSeriesX/2;
+				/ totalNodeX;
+
+		boundRight = mWidth - chartConfig.paddingRight;
+		boundLeft = mOrginX;
+
+		X_LAST_POSTION = boundRight;
 	}
 
 	public void updateDistanceX() {
@@ -135,7 +154,7 @@ public class LineChart extends DefaultChart<LineData> {
 		drawPanel(canvas);
 		drawAxis(canvas);
 		drawSeriesY(canvas);
-		
+
 	}
 
 	private void drawPanel(Canvas canvas) {
@@ -151,7 +170,6 @@ public class LineChart extends DefaultChart<LineData> {
 		// Ve truc X
 		canvas.drawLine(mOrginX, mOrginY, mWidth - chartConfig.paddingRight,
 				mOrginY, paintAxisX);
-
 		// // Ve truc Y
 		canvas.drawLine(mOrginX, mOrginY, mOrginX, chartConfig.paddingTop,
 				paintAxisY);
@@ -180,20 +198,12 @@ public class LineChart extends DefaultChart<LineData> {
 	}
 
 	private void drawSeriesX(Canvas canvas) {
-		float offset = mStartOffsetSeriesX;
-		float centerX;
-		float paddingRight;
-		float padding;
 		for (int i = mStartOffset; i < mEndOffset; i++) {
-			centerX = seriesX.get(i).centerX;
-			padding = seriesX.get(i).padding;
-			paddingRight = distanceSeriesX / 2 - centerX;
-			if (i > 0)
-				canvas.drawLine(offset, mStartOffsetSeriesY, offset, mStartOffsetSeriesY + 4,
-						mPaintSeriesX);
-			canvas.drawText(seriesX.get(i).title, offset + paddingRight,
-					mStartOffsetSeriesY + seriesX.get(i).height - padding, mPaintSeriesX);
-			offset += distanceSeriesX;
+			canvas.drawLine(seriesX.get(i).x, mStartOffsetSeriesY,
+					seriesX.get(i).x, mStartOffsetSeriesY + 4, mPaintSeriesX);
+			canvas.drawText(seriesX.get(i).title,
+					seriesX.get(i).x + seriesX.get(i).paddingRightText,
+					seriesX.get(i).y + seriesX.get(i).height, mPaintSeriesX);
 		}
 	}
 
@@ -221,7 +231,82 @@ public class LineChart extends DefaultChart<LineData> {
 		this.mEndOffset = mEndOffset;
 	}
 
-	public void updateSeriesX(float startOffsetX) {
-		mStartOffsetSeriesX = startOffsetX - padding;
+	public synchronized void updateSeriesX(float startOffsetX, boolean needRecal) {
+		if (needRecal) {
+			if (mStartOffset > 0) {
+				System.out.println("Recalculate");
+				startOffsetX -= distanceSeriesX;
+				mStartOffset--;
+			}
+		}
+		for (int i = mStartOffset; i < mEndOffset; i++) {
+			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
+			seriesX.get(i).x = startOffsetX;
+			seriesX.get(i).y = mStartOffsetSeriesY;
+			seriesX.get(i).paddingRightText = paddingRightText;
+			startOffsetX += distanceSeriesX;
+		}
 	}
+
+	public synchronized void updateSeriesXByRight(float startOffsetX) {
+		if (mStartOffset > 0) {
+			System.out.println("Recalculate");
+			startOffsetX -= distanceSeriesX;
+			mStartOffset--;
+			mEndOffset--;
+		}
+		for (int i = mStartOffset; i < mEndOffset; i++) {
+			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
+			seriesX.get(i).x = startOffsetX;
+			seriesX.get(i).y = mStartOffsetSeriesY;
+			seriesX.get(i).paddingRightText = paddingRightText;
+			startOffsetX += distanceSeriesX;
+		}
+	}
+
+	public synchronized void updateSeriesXByLeft(float startOffsetX) {
+		if (mEndOffset < totalNodeX) {
+			System.out.println("Recalculate");
+			mStartOffset++;
+			mEndOffset++;
+		}
+		for (int i = mStartOffset; i < mEndOffset; i++) {
+			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
+			seriesX.get(i).x = startOffsetX;
+			seriesX.get(i).y = mStartOffsetSeriesY;
+			seriesX.get(i).paddingRightText = paddingRightText;
+			startOffsetX += distanceSeriesX;
+		}
+	}
+
+	public boolean isBoundRight() {
+		if (seriesX.get(mEndOffset - 1).x == boundRight)
+			return true;
+		return false;
+	}
+
+	public float validStartOffsetXMoveLeft(float startOffsetX) {
+		return startOffsetX;
+	}
+
+	public synchronized boolean validMoveRight() {
+		if (seriesX.get(mStartOffset).x >= mOrginX) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validMoveLeft() {
+		System.out.println("X = " + seriesX.get(mEndOffset-1).x + distanceSeriesX);
+		if (seriesX.get(mEndOffset-1).x + distanceSeriesX<= boundRight) {
+			System.out.println("BUzz");
+			return true;
+		}
+		return false;
+	}
+
+	public float getFirstX() {
+		return seriesX.get(mStartOffset).x;
+	}
+
 }

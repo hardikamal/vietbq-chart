@@ -72,7 +72,6 @@ public abstract class DefaultChart<T extends ChartData> {
 		isFirstTime = false;
 		this.mWidth = width;
 		this.mHeight = height;
-		initVariables();
 	}
 
 	public void onTouchDown(MotionEvent motionEvent) {

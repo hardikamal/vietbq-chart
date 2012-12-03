@@ -6,4 +6,7 @@ public class SeriesX {
 	public float height;
 	public float padding;
 	public float centerX;
+	public float x;
+	public float y;
+	public float paddingRightText;
 }

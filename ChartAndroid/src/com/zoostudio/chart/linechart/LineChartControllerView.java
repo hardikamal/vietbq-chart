@@ -61,27 +61,50 @@ public class LineChartControllerView extends View {
 	private DIRECTION mDriection;
 	private float mLastX;
 	private int totalSeriesX;
-	
+
 	private float speedDraw;
 	private float fontSize;
 	private float borderLine;
+	private float[] offsetExtend;
 
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
 		chart = lineChart;
-		fontSize = getResources().getDimensionPixelOffset(R.dimen.defalut_font_size);
-		initChart();
-	}
-
-	private void initChart() {
+		fontSize = getResources().getDimensionPixelOffset(
+				R.dimen.defalut_font_size);
 		handler = new Handler();
+		offsetExtend = new float[1];
 		chartConfig = new LineChartConfig();
 		chartConfig.fontSize = fontSize;
-		
 		chartData = chart.getChartData();
 		totalSeriesX = chartData.size();
 		getOffset();
 		dataSeries = chart.getChartDataSeries();
+		initChart();
+	}
+
+	private void initChart() {
+
+		genChartConfig();
+
+		chart.numberLine = mNumberLine;
+		chart.numberStep = mNumberStep;
+
+		getSeriesX();
+		getSeriesY();
+		// Tinh step cua truc X
+
+		chart.setStartOffset(mStartOffset);
+		chart.setEndOffset(mEndOffset);
+
+		chart.seriesY = mSeriesY;
+		chart.seriesX = mSeriesX;
+
+		genViewPieceLine();
+		chart.chartConfig = chartConfig;
+	}
+
+	private void genChartConfig() {
 		getMaxMin();
 		float total = mMaxValue - mMinValue;
 		// Tinh step cua truc Y
@@ -97,21 +120,6 @@ public class LineChartControllerView extends View {
 				break;
 			}
 		}
-
-		chart.numberLine = mNumberLine;
-		chart.numberStep = mNumberStep;
-		getSeriesX();
-		getSeriesY();
-		// Tinh step cua truc X
-
-		chart.setStartOffset(mStartOffset);
-		chart.setEndOffset(mEndOffset);
-
-		chart.seriesY = mSeriesY;
-		chart.seriesX = mSeriesX;
-
-		genViewPieceLine();
-		chart.chartConfig = chartConfig;
 	}
 
 	private void getSeriesY() {
@@ -321,26 +329,34 @@ public class LineChartControllerView extends View {
 			if (xMove > mLastX) {
 				mLastX = xMove;
 				mDriection = DIRECTION.RIGHT;
-				if (chart.validMoveRight()) {
-					chart.updateSeriesXByRight(mOrginX);
+				if (chart.validMoveRight(offsetExtend)) {
+					chart.updateSeriesXByRight(mOrginX + offsetExtend[0]);
 					mDistanceX = mLastX - chart.getFirstX();
+//					genChartConfig();
+//					getSeriesY();
+//					for (int j = 0; j < dataSeries.length; j++) {
+//						ArrayList<LineData> chartData = dataSeries[j];
+//						lineViews.get(j).setData(
+//								chartData.subList(mStartOffset, mEndOffset));
+//						 lineViews.get(j).updateLine(mOrginX);
+//					}
+//					chart.seriesY = mSeriesY;
 					invalidate();
 					return true;
 				}
 			} else if (xMove < mLastX) {
-				System.out.println("Move Left");
-				mLastX = xMove;
-				mDriection = DIRECTION.LEFT;
-				if (chart.validMoveLeft()) {
-					chart.updateSeriesXByLeft(startOffsetX);
-					mDistanceX = mLastX - chart.getFirstX();
-					invalidate();
+//				mLastX = xMove;
+//				mDriection = DIRECTION.LEFT;
+//				if (chart.validMoveLeft(offsetExtend)) {
+//					chart.updateSeriesXByLeft(mOrginX-offsetExtend[0]);
+//					mDistanceX = mLastX - chart.getFirstX();
+//					invalidate();
 					return true;
-				}
+//				}
 			}
 			mLastX = xMove;
-			// lineViews.get(0).updateLine(startOffsetX);
-			// lineViews.get(1).updateLine(startOffsetX);
+//			lineViews.get(0).updateLine(startOffsetX);
+//			lineViews.get(1).updateLine(startOffsetX);
 			chart.updateSeriesX(startOffsetX, false);
 			invalidate();
 			return true;
@@ -349,4 +365,5 @@ public class LineChartControllerView extends View {
 		}
 		return super.onTouchEvent(event);
 	}
+
 }

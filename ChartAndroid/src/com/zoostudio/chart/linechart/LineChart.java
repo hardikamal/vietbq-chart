@@ -289,16 +289,21 @@ public class LineChart extends DefaultChart<LineData> {
 		return startOffsetX;
 	}
 
-	public synchronized boolean validMoveRight() {
+	public synchronized boolean validMoveRight(float offsetExtend[]) {
 		if (seriesX.get(mStartOffset).x >= mOrginX) {
+			offsetExtend[0] = mOrginX - seriesX.get(mStartOffset).x;
+			if (mStartOffset == 0) {
+				offsetExtend[0] = 0;
+			}
 			return true;
 		}
 		return false;
 	}
 
 	public boolean validMoveLeft() {
-		System.out.println("X = " + seriesX.get(mEndOffset-1).x + distanceSeriesX);
-		if (seriesX.get(mEndOffset-1).x + distanceSeriesX<= boundRight) {
+		System.out.println("X = " + seriesX.get(mEndOffset - 1).x
+				+ distanceSeriesX);
+		if (seriesX.get(mEndOffset - 1).x + distanceSeriesX <= boundRight) {
 			System.out.println("BUzz");
 			return true;
 		}

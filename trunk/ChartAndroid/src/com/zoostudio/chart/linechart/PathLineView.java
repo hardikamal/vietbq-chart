@@ -51,11 +51,13 @@ public class PathLineView extends View {
 
 	public PathLineView(Context context, MyColor color) {
 		super(context);
-		radius = getResources().getDimensionPixelSize(R.dimen.default_radius_node);
+		radius = getResources().getDimensionPixelSize(
+				R.dimen.default_radius_node);
 		nodes = new ArrayList<RectF>();
 		paint = new Paint();
 		paint.setColor(color.getColor());
-		paint.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.default_border_with));
+		paint.setStrokeWidth(getResources().getDimensionPixelSize(
+				R.dimen.default_border_with));
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
@@ -94,16 +96,15 @@ public class PathLineView extends View {
 		distanceSeriesX = (screenW - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ numberPieceXAxis;
 		points = new ArrayList<PointF>();
-		
-		mStartX = mOrginX;
-		x = mOrginX + distanceSeriesX / 2;
-		
 
-		for (int i = 0, n = listData.size(); i < n; i++) {
+		mStartX = mOrginX;
+		x = screenW - chartConfig.paddingRight - distanceSeriesX / 2;
+
+		for (int i = listData.size() - 1; i >= 0; i--) {
 			ratio = listData.get(i).getValue() / step;
 			y = mOrginY - (ratio * distanceSeriesY);
 			points.add(new PointF(x, y));
-			x += distanceSeriesX;
+			x -= distanceSeriesX;
 		}
 		float xCircle, yCircle;
 
@@ -135,25 +136,32 @@ public class PathLineView extends View {
 
 	public void setData(List<LineData> subList) {
 		listData = subList;
+		System.out.print("PathLine Start = " + listData.get(0).getTitle());
+		System.out.println(" | PathLine End = " + listData.get(listData.size()-1).getTitle());
 	}
-	
+
 	public float getStartX() {
 		return mStartX;
 	}
-	
+
+	public void updateConfig(float distanceSeriesY, float mNumberLine,
+			float mNumberStep) {
+		this.distanceSeriesY = distanceSeriesY;
+		step = mNumberStep;
+	}
+
 	public void updateLine(float mStartX) {
-		this.mStartX = mStartX + distanceSeriesX / 2;
-		x = mStartX;
+		x = mStartX - distanceSeriesX / 2;
 		points.clear();
 		nodes.clear();
 		path.reset();
-		for (int i = 0, n = listData.size(); i < n; i++) {
+		for (int i = listData.size() - 1; i >= 0; i--) {
 			ratio = listData.get(i).getValue() / step;
 			y = mOrginY - (ratio * distanceSeriesY);
 			points.add(new PointF(x, y));
-			x += distanceSeriesX;
+			x -= distanceSeriesX;
 		}
-		
+
 		float xCircle, yCircle;
 
 		xCircle = points.get(0).x - radius / 2;
@@ -170,8 +178,11 @@ public class PathLineView extends View {
 					yCircle + radius);
 			nodes.add(rectFCircle);
 			path.lineTo(points.get(i).x, points.get(i).y);
-
 		}
 		invalidate();
+	}
+
+	public float getFirstPoint() {
+		return points.get(0).x;
 	}
 }

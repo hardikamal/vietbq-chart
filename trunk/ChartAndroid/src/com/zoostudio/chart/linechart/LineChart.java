@@ -64,10 +64,11 @@ public class LineChart extends DefaultChart<LineData> {
 	/**
 	 * Vi tri x cua phan tu cuoi cung trong mang
 	 */
-	private float X_LAST_POSTION;
-	private float boundLeft;
-	private float distanceX;
 	private float paddingRightText;
+	private volatile boolean isBoundLeft;
+	private volatile boolean isBoundRight;
+	private int mTotalNode;
+	private boolean mfound;
 
 	public LineChart(LineChart.TYPE type) {
 		this.type = type;
@@ -75,6 +76,8 @@ public class LineChart extends DefaultChart<LineData> {
 
 	@Override
 	protected void initVariables() {
+		isBoundRight = true;
+		mTotalNode = seriesX.size();
 		mOrginX = chartConfig.paddingLeft;
 		mOrginY = mHeight - chartConfig.paddingBottom;
 		mStartOffsetSeriesY = mOrginY;
@@ -128,17 +131,24 @@ public class LineChart extends DefaultChart<LineData> {
 		mPaintSeriesX.setShader(new RadialGradient(0, 0, 5, Color.GRAY,
 				Color.BLACK, TileMode.CLAMP));
 
-		// Khoang cach giua moi line
-		totalNodeX = mEndOffset - mStartOffset;
+		genDistanceY();
 
-		distanceSeriesY = (mOrginY - chartConfig.paddingTop) / numberLine;
 		distanceSeriesX = (mWidth - chartConfig.paddingLeft - chartConfig.paddingRight)
 				/ totalNodeX;
 
 		boundRight = mWidth - chartConfig.paddingRight;
-		boundLeft = mOrginX;
+	}
 
-		X_LAST_POSTION = boundRight;
+	public void genDistanceY() {
+		distanceSeriesY = (mOrginY - chartConfig.paddingTop) / numberLine;
+	}
+
+	public float getDistanceSeriesY() {
+		return distanceSeriesY;
+	}
+
+	public void setTotalNodeX(int totalNodeX) {
+		this.totalNodeX = totalNodeX;
 	}
 
 	public void updateDistanceX() {
@@ -154,7 +164,6 @@ public class LineChart extends DefaultChart<LineData> {
 		drawPanel(canvas);
 		drawAxis(canvas);
 		drawSeriesY(canvas);
-
 	}
 
 	private void drawPanel(Canvas canvas) {
@@ -198,7 +207,8 @@ public class LineChart extends DefaultChart<LineData> {
 	}
 
 	private void drawSeriesX(Canvas canvas) {
-		for (int i = mStartOffset; i < mEndOffset; i++) {
+		System.out.println("Total node = " + mTotalNode);
+		for (int i = mTotalNode - 1; i >= 0; i--) {
 			canvas.drawLine(seriesX.get(i).x, mStartOffsetSeriesY,
 					seriesX.get(i).x, mStartOffsetSeriesY + 4, mPaintSeriesX);
 			canvas.drawText(seriesX.get(i).title,
@@ -231,87 +241,83 @@ public class LineChart extends DefaultChart<LineData> {
 		this.mEndOffset = mEndOffset;
 	}
 
-	public synchronized void updateSeriesX(float startOffsetX, boolean needRecal) {
-		if (needRecal) {
-			if (mStartOffset > 0) {
-				System.out.println("Recalculate");
-				startOffsetX -= distanceSeriesX;
+	public void updateSeriesXMoveRight(float startOffsetX) {
+		if (isBoundLeft)
+			return;
+		float offsetX = Math.abs(startOffsetX)
+				- ((mTotalNode - 1) * distanceSeriesX);
+		if (offsetX > mOrginX) {
+			float distance = offsetX - mOrginX;
+			startOffsetX -= distance;
+			isBoundLeft = true;
+		}
+		isBoundRight = false;
+		getNewPosition(startOffsetX);
+	}
+
+	private void getNewPosition(float startOffsetX) {
+		mfound = false;
+		for (int i = mTotalNode - 1; i >= 0; i--) {
+			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
+			seriesX.get(i).x = startOffsetX;
+			seriesX.get(i).y = mStartOffsetSeriesY;
+			seriesX.get(i).paddingRightText = paddingRightText;
+			startOffsetX -= distanceSeriesX;
+			if (seriesX.get(i).x - distanceSeriesX / 2 <= boundRight && !mfound) {
+				mfound = true;
+				mEndOffset = i;
+			}
+
+			if (seriesX.get(mStartOffset).x + distanceSeriesX / 2 > mOrginX
+					&& mStartOffset > 0) {
 				mStartOffset--;
 			}
 		}
-		for (int i = mStartOffset; i < mEndOffset; i++) {
-			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
-			seriesX.get(i).x = startOffsetX;
-			seriesX.get(i).y = mStartOffsetSeriesY;
-			seriesX.get(i).paddingRightText = paddingRightText;
-			startOffsetX += distanceSeriesX;
-		}
+		System.out.println("Title Start  = " + seriesX.get(mStartOffset).title
+				+ "- End = " + seriesX.get(mEndOffset).title);
 	}
 
-	public synchronized void updateSeriesXByRight(float startOffsetX) {
-		if (mStartOffset > 0) {
-			System.out.println("Recalculate");
-			startOffsetX -= distanceSeriesX;
-			mStartOffset--;
-			mEndOffset--;
+	public void updateSeriesXMoveLeft(float startOffsetX) {
+		if (isBoundRight)
+			return;
+		float offsetX = startOffsetX;
+		if (offsetX + distanceSeriesX < boundRight) {
+			startOffsetX = boundRight - distanceSeriesX;
+			isBoundRight = true;
 		}
-		for (int i = mStartOffset; i < mEndOffset; i++) {
-			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
-			seriesX.get(i).x = startOffsetX;
-			seriesX.get(i).y = mStartOffsetSeriesY;
-			seriesX.get(i).paddingRightText = paddingRightText;
-			startOffsetX += distanceSeriesX;
-		}
+		isBoundLeft = false;
+		getNewPosition(startOffsetX);
 	}
 
-	public synchronized void updateSeriesXByLeft(float startOffsetX) {
-		if (mEndOffset < totalNodeX) {
-			System.out.println("Recalculate");
-			mStartOffset++;
-			mEndOffset++;
-		}
-		for (int i = mStartOffset; i < mEndOffset; i++) {
-			paddingRightText = distanceSeriesX / 2 - seriesX.get(i).centerX;
-			seriesX.get(i).x = startOffsetX;
-			seriesX.get(i).y = mStartOffsetSeriesY;
-			seriesX.get(i).paddingRightText = paddingRightText;
-			startOffsetX += distanceSeriesX;
-		}
+	public int getStartOffset() {
+		return mStartOffset;
+	}
+
+	public int getEndOffset() {
+		return mEndOffset;
 	}
 
 	public boolean isBoundRight() {
-		if (seriesX.get(mEndOffset - 1).x == boundRight)
-			return true;
-		return false;
+		return isBoundRight;
+	}
+
+	public boolean isBoundLeft() {
+		return isBoundLeft;
 	}
 
 	public float validStartOffsetXMoveLeft(float startOffsetX) {
 		return startOffsetX;
 	}
 
-	public synchronized boolean validMoveRight(float offsetExtend[]) {
-		if (seriesX.get(mStartOffset).x >= mOrginX) {
-			offsetExtend[0] = mOrginX - seriesX.get(mStartOffset).x;
-			if (mStartOffset == 0) {
-				offsetExtend[0] = 0;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public boolean validMoveLeft() {
-		System.out.println("X = " + seriesX.get(mEndOffset - 1).x
-				+ distanceSeriesX);
-		if (seriesX.get(mEndOffset - 1).x + distanceSeriesX <= boundRight) {
-			System.out.println("BUzz");
-			return true;
-		}
-		return false;
-	}
-
 	public float getFirstX() {
-		return seriesX.get(mStartOffset).x;
+		return seriesX.get(mTotalNode - 1).x;
 	}
 
+	public float getDistanceSeriesX() {
+		return distanceSeriesX;
+	}
+
+	public float getOffsetStartX() {
+		return seriesX.get(mEndOffset).x + distanceSeriesX;
+	}
 }

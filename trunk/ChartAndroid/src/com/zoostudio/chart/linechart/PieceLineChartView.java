@@ -33,8 +33,8 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
-		float boderShadow = getResources().getDimensionPixelSize(R.dimen.default_border_shader);
-		paint.setShadowLayer(boderShadow, 0, 0, color.getColor());
+//		float boderShadow = getResources().getDimensionPixelSize(R.dimen.default_border_shader);
+//		paint.setShadowLayer(boderShadow, 0, 0, color.getColor());
 		path = new Path();
 	}
 
@@ -52,13 +52,12 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		distanceSeriesX = (screenW - data.paddingLeft - data.paddingRight)
 				/ data.numberPieceXAxis;
 
-		X = mOrginX + (distanceSeriesX * data.indexStart) + distanceSeriesX / 2;
+		X = mOrginX + (distanceSeriesX * data.indexStart);
 
 		ratio = data.valueStart / data.step;
 		Y = mOrginY - (ratio * distanceSeriesY);
 
-		EndX = mOrginX + (distanceSeriesX * data.indexEnd) + distanceSeriesX
-				/ 2;
+		EndX = mOrginX + (distanceSeriesX * data.indexEnd) ;
 		ratio = data.valueEnd / data.step;
 
 		EndY = mOrginY - (ratio * distanceSeriesY);
@@ -72,7 +71,6 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		path.moveTo(X, Y);
 	}
 
-	@SuppressLint("DrawAllocation")
 	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -87,7 +85,6 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 					X += speedX;
 					Y += speedY;
 					finishLastDraw = true;
-					// paint.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
 					canvas.drawPath(path, paint);
 					invalidate();
 					return;

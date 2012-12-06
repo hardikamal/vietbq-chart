@@ -50,7 +50,7 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		distanceSeriesX = (screenW - data.paddingLeft - data.paddingRight)
 				/ data.numberPieceXAxis;
 
-		x = mOrginX + (distanceSeriesX * data.indexStart) + distanceSeriesX / 2;
+		x = mOrginX + (distanceSeriesX * data.indexStart);
 
 		ratio = data.valueStart / data.step;
 		y = mOrginY - (ratio * distanceSeriesY);

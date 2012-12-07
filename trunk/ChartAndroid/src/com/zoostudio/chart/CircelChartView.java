@@ -43,7 +43,7 @@ public class CircelChartView extends LinearLayout implements
 		final Resources res = getResources();
 		final int defaultBorderColor = Color.WHITE;
 		final float defaultBorderWidth = res
-				.getDimension(R.dimen.default_border_with);
+				.getDimension(R.dimen.default_border_line);
 		final int defaultDurationAnim = 200;
 		final int defaultBorderColorSelected = Color.WHITE;
 

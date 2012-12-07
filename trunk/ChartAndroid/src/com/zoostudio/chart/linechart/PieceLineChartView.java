@@ -30,14 +30,14 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 		paint = new Paint();
 		paint.setColor(color.getColor());
 		paint.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.default_border_line));
-		speedX = getResources().getDimensionPixelSize(R.dimen.default_speed);
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStyle(Paint.Style.STROKE);
-//		float boderShadow = getResources().getDimensionPixelSize(R.dimen.default_border_shader);
-//		paint.setShadowLayer(boderShadow, 0, 0, color.getColor());
+		paint.setShadowLayer(1.2f, 0, 0, color.getColor());
 		path = new Path();
+		
+		speedX = getResources().getDimensionPixelSize(R.dimen.default_speed);
 	}
 
 	@Override

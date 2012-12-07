@@ -3,7 +3,6 @@ package com.zoostudio.chart.linechart;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -39,14 +38,14 @@ public class LineChartView extends RelativeLayout implements
 		dataLineChart.add(new LineData(200, "02/12"));
 		dataLineChart.add(new LineData(500, "03/12"));
 		dataLineChart.add(new LineData(1500, "04/12"));
-
+		dataLineChart.add(new LineData(1600, "05/12"));
 
 		ArrayList<LineData> data1LineChart = new ArrayList<LineData>();
 		data1LineChart.add(new LineData(1240, "12/01"));
 		data1LineChart.add(new LineData(352, "12/02"));
 		data1LineChart.add(new LineData(135, "12/03"));
 		data1LineChart.add(new LineData(875, "12/04"));
-		
+		data1LineChart.add(new LineData(0, "12/04"));
 		
 
 		try {

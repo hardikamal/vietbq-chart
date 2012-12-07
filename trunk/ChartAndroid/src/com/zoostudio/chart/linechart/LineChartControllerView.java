@@ -160,7 +160,10 @@ public class LineChartControllerView extends View {
 		}
 		chartConfig.paddingLeft = (float) Math.ceil(paddingLeft);
 	}
-
+	/**
+	 * Tinh gia tri start va end cua data khi draw <br>
+	 * Tinh ra tong so node cua truc X (So node hien thi duoc tren man hinh)
+	 */
 	private void getOffset() {
 		if (chartData.size() > MAX_SERIES_X) {
 			mEndOffset = chartData.size() - 1;
@@ -172,7 +175,9 @@ public class LineChartControllerView extends View {
 			mTotalNode = mEndOffset - (mStartOffset - 1);
 		}
 	}
-
+	/**
+	 * Lay ra danh sach cac diem tren truc X
+	 */
 	private void getSeriesX() {
 		mSeriesX = new ArrayList<SeriesX>();
 		Paint painText = new Paint();
@@ -198,7 +203,10 @@ public class LineChartControllerView extends View {
 		}
 		chartConfig.paddingBottom = paddingBottom;
 	}
-
+	
+	/**
+	 * Khoi tao cac View de tao animation va cac View duong line chart
+	 */
 	private void genViewPieceLine() {
 		ArrayList<MyColor> colours = ColorUtil.getColorsByDefinded(
 				dataSeries.length, getContext());

@@ -156,7 +156,7 @@ public class LineChartControllerView extends View {
 
 	private void getOffset() {
 		if (chartData.size() > MAX_SERIES_X) {
-			mEndOffset = chartData.size()-1;
+			mEndOffset = chartData.size() - 1;
 			mStartOffset = mEndOffset - (MAX_SERIES_X + 1);
 			mTotalNode = MAX_SERIES_X;
 		} else {
@@ -205,7 +205,7 @@ public class LineChartControllerView extends View {
 					chartConfig.paddingTop, chartConfig.paddingBottom,
 					chartConfig.paddingRight), mNumberLine, mNumberStep,
 					mTotalNode);
-			lineView.setData(chartData.subList(mStartOffset, mEndOffset));
+			lineView.setData(chartData.subList(mStartOffset, mEndOffset + 1));
 			lineView.setVisibility(View.INVISIBLE);
 
 			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
@@ -288,8 +288,10 @@ public class LineChartControllerView extends View {
 
 		float maxSeries;
 		float minSeries;
-		System.out.print("Title Pre Start = " + dataSeries[0].get(mStartOffset).getTitle());
-		System.out.println("| Title Pre END = " + dataSeries[0].get(mEndOffset).getTitle());
+		System.out.print("Title Pre Start = "
+				+ dataSeries[0].get(mStartOffset).getTitle());
+		System.out.println("| Title Pre END = "
+				+ dataSeries[0].get(mEndOffset).getTitle());
 		for (int i = 0, n = dataSeries.length; i < n; i++) {
 			ArrayList<LineData> data = dataSeries[i];
 			maxSeries = data.get(mStartOffset).getValue();
@@ -364,12 +366,13 @@ public class LineChartControllerView extends View {
 	private void regenChartConfig() {
 		mStartOffset = chart.getStartOffset();
 		mEndOffset = chart.getEndOffset();
-		
+
 		genChartConfig();
 		getSeriesY();
 		for (int j = 0; j < dataSeries.length; j++) {
 			ArrayList<LineData> chartData = dataSeries[j];
-			lineViews.get(j).setData(chartData.subList(mStartOffset, mEndOffset+1));
+			lineViews.get(j).setData(
+					chartData.subList(mStartOffset, mEndOffset + 1));
 		}
 		chart.seriesY = mSeriesY;
 		chart.numberLine = mNumberLine;

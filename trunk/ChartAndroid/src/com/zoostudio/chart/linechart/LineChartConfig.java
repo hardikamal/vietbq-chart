@@ -29,7 +29,7 @@ public class LineChartConfig {
 		paddingBottom = 15;
 		paddingLeft = 40;
 		paddingTop = 15;
-		paddingRight = 55;
+		paddingRight = 0;
 		fontColor = Color.BLACK;
 		fontSize = 12;
 	}

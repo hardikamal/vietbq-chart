@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -32,7 +33,7 @@ public class LineChartControllerView extends View {
 	private float mNumberStep;
 	private float mNumberLine;
 	private LineChartConfig chartConfig;
-	private float mOrginX, mOrginY;
+	private LineChartBackgroundView backgroundView;
 
 	public enum DIRECTION {
 		RIGHT, LEFT;
@@ -54,21 +55,14 @@ public class LineChartControllerView extends View {
 	private ArrayList<LineData>[] dataSeries;
 	private ArrayList<PathLineView> lineViews;
 	private int mAction;
-	private float yMove;
 	private float xMove;
 	private float startOffsetX;
 	private float mDistanceX;
-	private DIRECTION mDriection;
 	private float mLastX;
-	private int totalSeriesX;
 
-	private float speedDraw;
 	private float fontSize;
-	private float borderLine;
-	private float[] offsetExtend;
 	private int mTotalNode;
-	private float mDistanceLine;
-	private float startOffsetLineX;
+	private boolean updateResuslt;
 
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
@@ -76,11 +70,9 @@ public class LineChartControllerView extends View {
 		fontSize = getResources().getDimensionPixelOffset(
 				R.dimen.defalut_font_size);
 		handler = new Handler();
-		offsetExtend = new float[1];
 		chartConfig = new LineChartConfig();
 		chartConfig.fontSize = fontSize;
 		chartData = chart.getChartData();
-		totalSeriesX = chartData.size();
 		getOffset();
 		dataSeries = chart.getChartDataSeries();
 		initChart();
@@ -159,8 +151,8 @@ public class LineChartControllerView extends View {
 			mTotalNode = MAX_SERIES_X;
 		} else {
 			mStartOffset = 0;
-			mEndOffset = chartData.size();
-			mTotalNode = mEndOffset - mStartOffset;
+			mEndOffset = chartData.size()-1;
+			mTotalNode = mEndOffset - (mStartOffset -1);
 		}
 	}
 
@@ -191,7 +183,8 @@ public class LineChartControllerView extends View {
 	}
 
 	private void genViewPieceLine() {
-		ArrayList<MyColor> colours = ColorUtil.getColor(dataSeries.length);
+		ArrayList<MyColor> colours = ColorUtil.getColorsByDefinded(
+				dataSeries.length, getContext());
 		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
 		for (int j = 0; j < dataSeries.length; j++) {
@@ -262,13 +255,13 @@ public class LineChartControllerView extends View {
 			chartSeriesComponents.add(arrayComponents);
 			lineViews.add(lineView);
 		}
+		backgroundView = new LineChartBackgroundView(getContext(), Color.GRAY);
+		backgroundView.setConfig(chartConfig, mNumberLine);
 	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		mOrginX = chartConfig.paddingLeft;
-		mOrginY = h - chartConfig.paddingBottom;
 		chart.setTotalNodeX(mTotalNode);
 		chart.setDimen(w, h);
 		chart.initVariables();
@@ -287,10 +280,6 @@ public class LineChartControllerView extends View {
 
 		float maxSeries;
 		float minSeries;
-		System.out.print("Title Pre Start = "
-				+ dataSeries[0].get(mStartOffset).getTitle());
-		System.out.println("| Title Pre END = "
-				+ dataSeries[0].get(mEndOffset).getTitle());
 		for (int i = 0, n = dataSeries.length; i < n; i++) {
 			ArrayList<LineData> data = dataSeries[i];
 			maxSeries = data.get(mStartOffset).getValue();
@@ -338,7 +327,11 @@ public class LineChartControllerView extends View {
 			startOffsetX = xMove - mDistanceX;
 			if (xMove > mLastX) {
 				mLastX = xMove;
-				chart.updateSeriesXMoveRight(startOffsetX);
+				updateResuslt = chart.updateSeriesXMoveRight(startOffsetX);
+				if(!updateResuslt){
+					mDistanceX = mLastX - chart.getFirstX();
+					return true;
+				}
 				regenChartConfig();
 				lineViews.get(0).updateLine(chart.getOffsetStartX());
 				lineViews.get(1).updateLine(chart.getOffsetStartX());
@@ -347,7 +340,11 @@ public class LineChartControllerView extends View {
 
 			} else if (xMove < mLastX) {
 				mLastX = xMove;
-				chart.updateSeriesXMoveLeft(startOffsetX);
+				updateResuslt = chart.updateSeriesXMoveLeft(startOffsetX);
+				if(!updateResuslt){
+					mDistanceX = mLastX - chart.getFirstX();
+					return true;
+				}
 				regenChartConfig();
 				lineViews.get(0).updateLine(chart.getOffsetStartX());
 				lineViews.get(1).updateLine(chart.getOffsetStartX());
@@ -381,6 +378,11 @@ public class LineChartControllerView extends View {
 				mNumberStep);
 		lineViews.get(1).updateConfig(chart.getDistanceSeriesY(), mNumberLine,
 				mNumberStep);
+		backgroundView.updateLine(mNumberLine);
+	}
+
+	public LineChartBackgroundView getBackgroundView() {
+		return backgroundView;
 	}
 
 }

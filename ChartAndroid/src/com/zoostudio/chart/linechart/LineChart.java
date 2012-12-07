@@ -69,6 +69,9 @@ public class LineChart extends DefaultChart<LineData> {
 	private volatile boolean isBoundRight;
 	private int mTotalNode;
 	private boolean mfound;
+	private float offset;
+	private float paddingSeriesY;
+	private float heightSeriesY;
 
 	public LineChart(LineChart.TYPE type) {
 		this.type = type;
@@ -159,7 +162,7 @@ public class LineChart extends DefaultChart<LineData> {
 
 	@Override
 	protected void drawChart(Canvas canvas) {
-		drawLine(canvas);
+		// drawLine(canvas);
 		drawSeriesX(canvas);
 		drawPanel(canvas);
 		drawAxis(canvas);
@@ -194,14 +197,13 @@ public class LineChart extends DefaultChart<LineData> {
 	}
 
 	private void drawSeriesY(Canvas canvas) {
-		float offset = mOrginY - distanceSeriesY;
-		float padding, height;
+		offset = mOrginY - distanceSeriesY;
 		for (int i = 0; i < numberLine; i++) {
-			padding = seriesY.get(i).padding;
-			height = seriesY.get(i).height;
+			paddingSeriesY = seriesY.get(i).padding;
+			heightSeriesY = seriesY.get(i).height;
 			canvas.drawLine(mOrginX - 4, offset, mOrginX, offset, mPaintSeriesY);
-			canvas.drawText(seriesY.get(i).title, mOrginX - padding, offset
-					+ height / 2, mPaintSeriesY);
+			canvas.drawText(seriesY.get(i).title, mOrginX - paddingSeriesY,
+					offset + heightSeriesY / 2, mPaintSeriesY);
 			offset -= distanceSeriesY;
 		}
 	}
@@ -241,9 +243,9 @@ public class LineChart extends DefaultChart<LineData> {
 		this.mEndOffset = mEndOffset;
 	}
 
-	public void updateSeriesXMoveRight(float startOffsetX) {
+	public boolean updateSeriesXMoveRight(float startOffsetX) {
 		if (isBoundLeft)
-			return;
+			return false;
 		float offsetX = Math.abs(startOffsetX)
 				- ((mTotalNode - 1) * distanceSeriesX);
 		if (offsetX > mOrginX) {
@@ -253,6 +255,7 @@ public class LineChart extends DefaultChart<LineData> {
 		}
 		isBoundRight = false;
 		getNewPosition(startOffsetX);
+		return true;
 	}
 
 	private void getNewPosition(float startOffsetX) {
@@ -277,9 +280,9 @@ public class LineChart extends DefaultChart<LineData> {
 				+ "- End = " + seriesX.get(mEndOffset).title);
 	}
 
-	public void updateSeriesXMoveLeft(float startOffsetX) {
+	public boolean updateSeriesXMoveLeft(float startOffsetX) {
 		if (isBoundRight)
-			return;
+			return false;
 		float offsetX = startOffsetX;
 		if (offsetX + distanceSeriesX < boundRight) {
 			startOffsetX = boundRight - distanceSeriesX;
@@ -287,6 +290,7 @@ public class LineChart extends DefaultChart<LineData> {
 		}
 		isBoundLeft = false;
 		getNewPosition(startOffsetX);
+		return true;
 	}
 
 	public int getStartOffset() {

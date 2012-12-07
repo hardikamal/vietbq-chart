@@ -2,7 +2,10 @@ package com.zoostudio.chart.util;
 
 import java.util.ArrayList;
 
+import android.content.Context;
+
 import com.zoostudio.bean.MyColor;
+import com.zoostudio.chart.R;
 
 public class ColorUtil {
 	public static ArrayList<MyColor> getColor(int numberOfColor) {
@@ -30,5 +33,14 @@ public class ColorUtil {
 		}
 		return alreadyChoosenColors;
 	}
-
+	public static ArrayList<MyColor> getColorsByDefinded(int numberOfColor,Context context){
+		ArrayList<MyColor> alreadyChoosenColors = new ArrayList<MyColor>();
+		String[] cl = context.getResources().getStringArray(R.array.colours);
+		for(String item : cl){
+			MyColor color = new MyColor(item);
+			alreadyChoosenColors.add(color);
+		}
+		return alreadyChoosenColors;
+		
+	}
 }

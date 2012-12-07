@@ -13,6 +13,7 @@ public class CircleNodeData extends ChartData {
 	
 	public float numberLine;
 	public float numberPieceXAxis;
+	public float endOffset;
 	
 	
 }

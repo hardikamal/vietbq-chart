@@ -23,6 +23,8 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 	private float EndX;
 	private float EndY;
 
+	private float mStartOffset;
+	
 	public PieceLineChartView(Context context, Handler handler, MyColor color) {
 		super(context, handler);
 		paint = new Paint();
@@ -51,13 +53,15 @@ public class PieceLineChartView extends ComponentChartView<PieceLineData> {
 
 		distanceSeriesX = (screenW - data.paddingLeft - data.paddingRight)
 				/ data.numberPieceXAxis;
-
-		X = mOrginX + (distanceSeriesX * data.indexStart);
+		
+		mStartOffset = screenW - data.paddingRight - distanceSeriesX/2;
+		
+		X = mStartOffset - (distanceSeriesX * (data.endOffset- data.indexStart));
 
 		ratio = data.valueStart / data.step;
 		Y = mOrginY - (ratio * distanceSeriesY);
 
-		EndX = mOrginX + (distanceSeriesX * data.indexEnd) ;
+		EndX = mStartOffset - (distanceSeriesX *(data.endOffset- data.indexEnd)) ;
 		ratio = data.valueEnd / data.step;
 
 		EndY = mOrginY - (ratio * distanceSeriesY);

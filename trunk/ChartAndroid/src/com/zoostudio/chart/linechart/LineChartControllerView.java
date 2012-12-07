@@ -123,8 +123,6 @@ public class LineChartControllerView extends View {
 				break;
 			}
 		}
-		System.out.println("Number step =" + mNumberStep + " Line ="
-				+ mNumberLine);
 	}
 
 	private void getSeriesY() {
@@ -196,7 +194,6 @@ public class LineChartControllerView extends View {
 		ArrayList<MyColor> colours = ColorUtil.getColor(dataSeries.length);
 		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
-		int k = 0;
 		for (int j = 0; j < dataSeries.length; j++) {
 			ArrayList<LineData> chartData = dataSeries[j];
 			PathLineView lineView = new PathLineView(getContext(),
@@ -209,11 +206,10 @@ public class LineChartControllerView extends View {
 			lineView.setVisibility(View.INVISIBLE);
 
 			ArrayList<ComponentChartView<?>> arrayComponents = new ArrayList<ComponentChartView<?>>();
-			k = 0;
-			for (int i = mStartOffset; i < mEndOffset; i++, k++) {
+			for (int i = mStartOffset; i < mEndOffset; i++) {
 				final PieceLineData data = new PieceLineData();
-				data.indexStart = k;
-				data.indexEnd = k + 1;
+				data.indexStart = i;
+				data.indexEnd = i + 1;
 				data.valueStart = chartData.get(i).getValue();
 				data.valueEnd = chartData.get(i + 1).getValue();
 				data.step = mNumberStep;
@@ -223,6 +219,7 @@ public class LineChartControllerView extends View {
 				data.paddingTop = chartConfig.paddingTop;
 				data.numberPieceXAxis = mTotalNode;
 				data.numberLine = mNumberLine;
+				data.endOffset = mEndOffset;
 				final PieceLineChartView piece = new PieceLineChartView(
 						getContext(), handler, colours.get(j));
 				piece.setData(data);
@@ -230,7 +227,7 @@ public class LineChartControllerView extends View {
 				final CircleNodeView nodeView = new CircleNodeView(
 						getContext(), handler, colours.get(j));
 				final CircleNodeData nodeData = new CircleNodeData();
-				nodeData.indexStart = k;
+				nodeData.indexStart = i;
 				nodeData.valueStart = chartData.get(i).getValue();
 				nodeData.step = mNumberStep;
 				nodeData.paddingLeft = chartConfig.paddingLeft;
@@ -239,6 +236,7 @@ public class LineChartControllerView extends View {
 				nodeData.paddingTop = chartConfig.paddingTop;
 				nodeData.numberPieceXAxis = mTotalNode;
 				nodeData.numberLine = mNumberLine;
+				nodeData.endOffset = mEndOffset;
 				nodeView.setData(nodeData);
 
 				arrayComponents.add(nodeView);
@@ -248,8 +246,8 @@ public class LineChartControllerView extends View {
 			final CircleNodeView nodeView = new CircleNodeView(getContext(),
 					handler, colours.get(j));
 			final CircleNodeData nodeData = new CircleNodeData();
-			nodeData.indexStart = k;
-			nodeData.valueStart = chartData.get(mEndOffset - 1).getValue();
+			nodeData.indexStart = mEndOffset;
+			nodeData.valueStart = chartData.get(mEndOffset).getValue();
 			nodeData.step = mNumberStep;
 			nodeData.paddingLeft = chartConfig.paddingLeft;
 			nodeData.paddingBottom = chartConfig.paddingBottom;
@@ -257,6 +255,7 @@ public class LineChartControllerView extends View {
 			nodeData.paddingTop = chartConfig.paddingTop;
 			nodeData.numberPieceXAxis = mTotalNode;
 			nodeData.numberLine = mNumberLine;
+			nodeData.endOffset = mEndOffset;
 			nodeView.setData(nodeData);
 			arrayComponents.add(nodeView);
 

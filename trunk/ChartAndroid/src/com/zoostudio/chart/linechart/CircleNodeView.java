@@ -20,6 +20,7 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 	private float x, y;
 	private float radius;
 	private int color;
+	private float mStartOffset;
 
 	public CircleNodeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -49,8 +50,10 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		distanceSeriesY = (mOrginY - data.paddingTop) / data.numberLine;
 		distanceSeriesX = (screenW - data.paddingLeft - data.paddingRight)
 				/ data.numberPieceXAxis;
-
-		x = mOrginX + (distanceSeriesX * data.indexStart);
+		
+		mStartOffset = screenW - data.paddingRight - distanceSeriesX/2;
+		
+		x = mStartOffset - (distanceSeriesX * (data.endOffset- data.indexStart));
 
 		ratio = data.valueStart / data.step;
 		y = mOrginY - (ratio * distanceSeriesY);
@@ -58,8 +61,6 @@ public class CircleNodeView extends ComponentChartView<CircleNodeData> {
 		x = x - radius / 2;
 		y = y - radius / 2;
 		rectF = new RectF(x, y, x + radius, y + radius);
-		// mPaint.setShadowLayer(2f, x + radius / 2, y + radius / 2,
-		// Color.GREEN);
 	}
 
 	private void initVariables() {

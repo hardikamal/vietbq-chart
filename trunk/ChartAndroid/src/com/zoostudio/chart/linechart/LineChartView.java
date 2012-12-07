@@ -56,7 +56,7 @@ public class LineChartView extends RelativeLayout implements
 		dataLineChart.add(new LineData(850, "19/12"));
 		dataLineChart.add(new LineData(3200, "20/12"));
 		dataLineChart.add(new LineData(2900, "21/12"));
-		
+
 		ArrayList<LineData> data1LineChart = new ArrayList<LineData>();
 		data1LineChart.add(new LineData(1240, "12/01"));
 		data1LineChart.add(new LineData(352, "12/02"));
@@ -79,10 +79,11 @@ public class LineChartView extends RelativeLayout implements
 		data1LineChart.add(new LineData(321, "12/19"));
 		data1LineChart.add(new LineData(762, "12/20"));
 		data1LineChart.add(new LineData(1287, "12/21"));
-		
+
 		try {
 			lineChart.setSeries(dataLineChart, data1LineChart);
-			controllerLineChart = new LineChartControllerView(getContext(), lineChart);
+			controllerLineChart = new LineChartControllerView(getContext(),
+					lineChart);
 			View bg = new View(getContext());
 			bg.setBackgroundColor(Color.WHITE);
 			addView(bg);
@@ -91,7 +92,6 @@ public class LineChartView extends RelativeLayout implements
 			for (PathLineView line : linesChart) {
 				addView(line);
 			}
-			addView(controllerLineChart);
 			int n = 0;
 			for (ArrayList<ComponentChartView<?>> item : componentsChart) {
 				n = item.size();
@@ -110,11 +110,13 @@ public class LineChartView extends RelativeLayout implements
 					addView(item.get(i));
 				}
 			}
+			addView(controllerLineChart);
+
 			int m = componentsChart.size() - 1;
 			for (int i = 0; i <= m; i++) {
 				componentsChart.get(i).get(0).onDrawFinishLitener();
 			}
-			
+
 			componentsChart.get(m).get(n - 1)
 					.setOnDrawChartFinishListener(this);
 
@@ -125,9 +127,9 @@ public class LineChartView extends RelativeLayout implements
 
 	@Override
 	public void onFinish() {
-		int n = componentsChart.get(0).size() * 2;		
+		int n = componentsChart.get(0).size() * 2;
 		for (int i = 0; i < n; i++) {
-			removeViewAt(4);
+			removeViewAt(3);
 		}
 		for (PathLineView line : linesChart) {
 			line.setVisibility(View.VISIBLE);

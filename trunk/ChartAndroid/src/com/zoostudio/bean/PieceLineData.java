@@ -13,4 +13,6 @@ public class PieceLineData extends ChartData {
 	public float valueStart;
 	public float indexEnd;
 	public float valueEnd;
+	
+	public float endOffset;
 }

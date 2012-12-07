@@ -57,7 +57,7 @@ public class PathLineView extends View {
 		paint = new Paint();
 		paint.setColor(color.getColor());
 		paint.setStrokeWidth(getResources().getDimensionPixelSize(
-				R.dimen.default_border_with));
+				R.dimen.default_border_line));
 		paint.setAntiAlias(true);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStrokeJoin(Paint.Join.ROUND);

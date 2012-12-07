@@ -2,7 +2,6 @@ package com.zoostudio.chart.linechart;
 
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,7 +22,6 @@ import com.zoostudio.bean.SeriesY;
 import com.zoostudio.chart.R;
 import com.zoostudio.chart.util.ColorUtil;
 
-@SuppressLint("ViewConstructor")
 public class LineChartControllerView extends View {
 	private LineChart chart;
 	private final static int MAX_LINE = 6;
@@ -34,10 +32,6 @@ public class LineChartControllerView extends View {
 	private float mNumberLine;
 	private LineChartConfig chartConfig;
 	private LineChartBackgroundView backgroundView;
-
-	public enum DIRECTION {
-		RIGHT, LEFT;
-	}
 
 	private ArrayList<LineData> chartData;
 	private ArrayList<SeriesX> mSeriesX;
@@ -57,15 +51,38 @@ public class LineChartControllerView extends View {
 	private int mAction;
 	private float xMove;
 	private float startOffsetX;
+	/**
+	 * Khoang cach tu vi tri touch den diem cuoi cung cua truc X
+	 */
 	private float mDistanceX;
+	/**
+	 * Gia tri touch truoc do
+	 */
 	private float mLastX;
-
+	/**
+	 * Font size cua truc X va Y
+	 */
 	private float fontSize;
+	/**
+	 * Tong so node cua truc X
+	 */
 	private int mTotalNode;
+	/**
+	 * Bien de kiem tra qua trinh update lai du lieu truc X
+	 */
 	private boolean updateResuslt;
+	
+	/**
+	 * Bien su dung de kiem tra neu Animation dang chay thi khong the touch
+	 */
+	private volatile boolean isAnimating;
 
+	public LineChartControllerView(Context context){
+		super(context);
+	}
 	public LineChartControllerView(Context context, LineChart lineChart) {
 		super(context);
+		isAnimating = true;
 		chart = lineChart;
 		fontSize = getResources().getDimensionPixelOffset(
 				R.dimen.defalut_font_size);
@@ -151,8 +168,8 @@ public class LineChartControllerView extends View {
 			mTotalNode = MAX_SERIES_X;
 		} else {
 			mStartOffset = 0;
-			mEndOffset = chartData.size()-1;
-			mTotalNode = mEndOffset - (mStartOffset -1);
+			mEndOffset = chartData.size() - 1;
+			mTotalNode = mEndOffset - (mStartOffset - 1);
 		}
 	}
 
@@ -316,6 +333,8 @@ public class LineChartControllerView extends View {
 		mAction = event.getAction();
 		switch (mAction) {
 		case MotionEvent.ACTION_DOWN:
+			if (isAnimating)
+				return false;
 			mLastX = event.getX();
 			System.out.println("X= " + mLastX);
 			mDistanceX = mLastX - chart.getFirstX();
@@ -328,7 +347,7 @@ public class LineChartControllerView extends View {
 			if (xMove > mLastX) {
 				mLastX = xMove;
 				updateResuslt = chart.updateSeriesXMoveRight(startOffsetX);
-				if(!updateResuslt){
+				if (!updateResuslt) {
 					mDistanceX = mLastX - chart.getFirstX();
 					return true;
 				}
@@ -341,7 +360,7 @@ public class LineChartControllerView extends View {
 			} else if (xMove < mLastX) {
 				mLastX = xMove;
 				updateResuslt = chart.updateSeriesXMoveLeft(startOffsetX);
-				if(!updateResuslt){
+				if (!updateResuslt) {
 					mDistanceX = mLastX - chart.getFirstX();
 					return true;
 				}
@@ -384,5 +403,8 @@ public class LineChartControllerView extends View {
 	public LineChartBackgroundView getBackgroundView() {
 		return backgroundView;
 	}
-
+	
+	public void finishAnimate(){
+		isAnimating = false;
+	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -16,6 +17,8 @@ public class LineChartView extends RelativeLayout implements
 	private LineChartControllerView controllerLineChart;
 	private ArrayList<ArrayList<ComponentChartView<?>>> componentsChart;
 	private ArrayList<PathLineView> linesChart;
+	private boolean isAnimation;
+	private boolean startTouch;
 
 	public LineChartView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -39,6 +42,11 @@ public class LineChartView extends RelativeLayout implements
 		dataLineChart.add(new LineData(500, "03/12"));
 		dataLineChart.add(new LineData(1500, "04/12"));
 		dataLineChart.add(new LineData(1600, "05/12"));
+		dataLineChart.add(new LineData(1500, "01/12"));
+		dataLineChart.add(new LineData(200, "02/12"));
+		dataLineChart.add(new LineData(500, "03/12"));
+		dataLineChart.add(new LineData(1500, "04/12"));
+		dataLineChart.add(new LineData(1600, "05/12"));
 
 		ArrayList<LineData> data1LineChart = new ArrayList<LineData>();
 		data1LineChart.add(new LineData(1240, "12/01"));
@@ -46,13 +54,17 @@ public class LineChartView extends RelativeLayout implements
 		data1LineChart.add(new LineData(135, "12/03"));
 		data1LineChart.add(new LineData(875, "12/04"));
 		data1LineChart.add(new LineData(0, "12/04"));
-		
+		data1LineChart.add(new LineData(1240, "12/01"));
+		data1LineChart.add(new LineData(352, "12/02"));
+		data1LineChart.add(new LineData(135, "12/03"));
+		data1LineChart.add(new LineData(875, "12/04"));
+		data1LineChart.add(new LineData(0, "12/04"));
 
 		try {
 			lineChart.setSeries(dataLineChart, data1LineChart);
 			controllerLineChart = new LineChartControllerView(getContext(),
 					lineChart);
-			View bg =controllerLineChart.getBackgroundView();
+			View bg = controllerLineChart.getBackgroundView();
 			addView(bg);
 			componentsChart = controllerLineChart.getComponents();
 			linesChart = controllerLineChart.getLines();
@@ -86,7 +98,6 @@ public class LineChartView extends RelativeLayout implements
 
 			componentsChart.get(m).get(n - 1)
 					.setOnDrawChartFinishListener(this);
-
 		} catch (InvalidSeriesException e) {
 			e.printStackTrace();
 		}
@@ -101,5 +112,7 @@ public class LineChartView extends RelativeLayout implements
 		for (PathLineView line : linesChart) {
 			line.setVisibility(View.VISIBLE);
 		}
+		controllerLineChart.finishAnimate();
 	}
+
 }

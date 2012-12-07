@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
      <string-array name="colours">
-        <item >#0000FF</item>
-        <item >#8000FF</item>
-        <item >#FF00FF</item>
-        <item >#FF0080</item>
-        <item >#00FFFF</item>
-        <item >#FFFF7A</item>
-        <item >#FFFF3D</item>
-        <item >#FF8000</item>
-        <item >#00FF80</item>
-        <item >#00FF00</item>
-        <item >#80FF00</item>
-        <item >#FFFF00</item>
-        <item >#33CC33</item>
-        <item >#64D864</item>
-        <item >#CCCC33</item>
-        <item >#CC8033</item>
-        <item >#CC3333</item>
-        <item >#E495E4</item>
-        <item >#CC3380</item>
-        <item >#8033CC</item>
+        <item >#03D907</item>
+        <item >#F90102</item>
+        <item >#DA5529</item>
+        <item >#DA5529</item>
     </string-array>
 </resources>

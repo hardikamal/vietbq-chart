@@ -187,14 +187,6 @@ public class LineChart extends DefaultChart<LineData> {
 				paintAxisY);
 	}
 
-	private void drawLine(Canvas canvas) {
-		float offset = mOrginY - distanceSeriesY;
-		for (int i = 1; i <= numberLine; i++) {
-			canvas.drawLine(mOrginX, offset, mWidth - chartConfig.paddingRight,
-					offset, mPaintLine);
-			offset -= distanceSeriesY;
-		}
-	}
 
 	private void drawSeriesY(Canvas canvas) {
 		offset = mOrginY - distanceSeriesY;

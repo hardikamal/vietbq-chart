@@ -47,8 +47,6 @@ public class LineChartView extends RelativeLayout implements
 			componentsChart = controllerLineChart.getComponents();
 			linesChart = controllerLineChart.getLines();
 			legendView = controllerLineChart.getLegendView();
-			legendView.setLayoutParams(new RelativeLayout.LayoutParams(
-					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 			for (PathLineView line : linesChart) {
 				addView(line);
 			}

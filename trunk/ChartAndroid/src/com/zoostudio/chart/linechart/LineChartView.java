@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zoostudio.bean.ItemChart;
 import com.zoostudio.bean.LineData;
+import com.zoostudio.chart.R;
 import com.zoostudio.chart.exception.InvalidSeriesException;
 
 public class LineChartView extends RelativeLayout implements
@@ -19,6 +19,9 @@ public class LineChartView extends RelativeLayout implements
 	private ArrayList<PathLineView> linesChart;
 	private boolean isAnimation;
 	private boolean startTouch;
+	private LineLegendView legendView;
+	private int widthLegendView;
+	private int heightLegendView;
 
 	public LineChartView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -33,41 +36,19 @@ public class LineChartView extends RelativeLayout implements
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setData(ArrayList<ItemChart> data) {
-		LineChart lineChart = new LineChart(LineChart.TYPE.DAY);
-
-		ArrayList<LineData> dataLineChart = new ArrayList<LineData>();
-		dataLineChart.add(new LineData(1500, "01/12"));
-		dataLineChart.add(new LineData(200, "02/12"));
-		dataLineChart.add(new LineData(500, "03/12"));
-		dataLineChart.add(new LineData(1500, "04/12"));
-		dataLineChart.add(new LineData(1600, "05/12"));
-		dataLineChart.add(new LineData(1500, "01/12"));
-		dataLineChart.add(new LineData(200, "02/12"));
-		dataLineChart.add(new LineData(500, "03/12"));
-		dataLineChart.add(new LineData(1500, "04/12"));
-		dataLineChart.add(new LineData(1600, "05/12"));
-
-		ArrayList<LineData> data1LineChart = new ArrayList<LineData>();
-		data1LineChart.add(new LineData(1240, "12/01"));
-		data1LineChart.add(new LineData(352, "12/02"));
-		data1LineChart.add(new LineData(135, "12/03"));
-		data1LineChart.add(new LineData(875, "12/04"));
-		data1LineChart.add(new LineData(0, "12/04"));
-		data1LineChart.add(new LineData(1240, "12/01"));
-		data1LineChart.add(new LineData(352, "12/02"));
-		data1LineChart.add(new LineData(135, "12/03"));
-		data1LineChart.add(new LineData(875, "12/04"));
-		data1LineChart.add(new LineData(0, "12/04"));
-
+	public void setData(ArrayList<String> legendItems,ArrayList<LineData> ...data) {
+		LineChart lineChart = new LineChart();
 		try {
-			lineChart.setSeries(dataLineChart, data1LineChart);
+			lineChart.setSeries(data);
 			controllerLineChart = new LineChartControllerView(getContext(),
-					lineChart);
+					lineChart,legendItems);
 			View bg = controllerLineChart.getBackgroundView();
 			addView(bg);
 			componentsChart = controllerLineChart.getComponents();
 			linesChart = controllerLineChart.getLines();
+			legendView = controllerLineChart.getLegendView();
+			legendView.setLayoutParams(new RelativeLayout.LayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 			for (PathLineView line : linesChart) {
 				addView(line);
 			}
@@ -90,12 +71,11 @@ public class LineChartView extends RelativeLayout implements
 				}
 			}
 			addView(controllerLineChart);
-
+			addView(legendView);
 			int m = componentsChart.size() - 1;
 			for (int i = 0; i <= m; i++) {
 				componentsChart.get(i).get(0).onDrawFinishLitener();
 			}
-
 			componentsChart.get(m).get(n - 1)
 					.setOnDrawChartFinishListener(this);
 		} catch (InvalidSeriesException e) {

@@ -17,9 +17,6 @@ import com.zoostudio.bean.SeriesY;
 import com.zoostudio.chart.DefaultChart;
 
 public class LineChart extends DefaultChart<LineData> {
-	public static enum TYPE {
-		DAY, WEEK, MONTH, YEAR
-	}
 
 	float numberStep;
 	float numberLine;
@@ -42,7 +39,6 @@ public class LineChart extends DefaultChart<LineData> {
 	public ArrayList<SeriesY> seriesY;
 	public ArrayList<SeriesX> seriesX;
 	private Paint mPaintSeriesX;
-	private TYPE type;
 	private int mStartOffset;
 	private int mEndOffset;
 
@@ -72,10 +68,6 @@ public class LineChart extends DefaultChart<LineData> {
 	private float offset;
 	private float paddingSeriesY;
 	private float heightSeriesY;
-
-	public LineChart(LineChart.TYPE type) {
-		this.type = type;
-	}
 
 	@Override
 	protected void initVariables() {
@@ -201,7 +193,6 @@ public class LineChart extends DefaultChart<LineData> {
 	}
 
 	private void drawSeriesX(Canvas canvas) {
-		System.out.println("Total node = " + mTotalNode);
 		for (int i = mTotalNode - 1; i >= 0; i--) {
 			canvas.drawLine(seriesX.get(i).x, mStartOffsetSeriesY,
 					seriesX.get(i).x, mStartOffsetSeriesY + 4, mPaintSeriesX);

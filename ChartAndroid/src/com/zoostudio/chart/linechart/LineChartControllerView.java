@@ -11,6 +11,8 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.zoostudio.bean.CircleNodeData;
 import com.zoostudio.bean.LegendItem;
@@ -81,13 +83,20 @@ public class LineChartControllerView extends View {
 	private volatile boolean isAnimating;
 	private LineLegendView legendView;
 	private ArrayList<String> legendTitles;
+	private int widthLegendView;
+	private int heightLegendView;
 
 	public LineChartControllerView(Context context) {
 		super(context);
 	}
 
-	public LineChartControllerView(Context context, LineChart lineChart,ArrayList<String> legendTitles) {
+	public LineChartControllerView(Context context, LineChart lineChart,
+			ArrayList<String> legendTitles) {
 		super(context);
+		widthLegendView = getResources().getDimensionPixelSize(
+				R.dimen.width_legend_view);
+		heightLegendView = getResources().getDimensionPixelSize(
+				R.dimen.height_legend_view);
 		this.legendTitles = legendTitles;
 		isAnimating = true;
 		chart = lineChart;
@@ -212,6 +221,7 @@ public class LineChartControllerView extends View {
 		}
 		chartConfig.paddingBottom = paddingBottom;
 	}
+
 	/**
 	 * Khoi tao cac View de tao animation va cac View duong line chart
 	 */
@@ -219,6 +229,13 @@ public class LineChartControllerView extends View {
 		ArrayList<MyColor> colours = ColorUtil.getColorsByDefinded(
 				dataSeries.length, getContext());
 		legendView = new LineLegendView(getContext());
+		LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		params.setMargins(0, 5, 5, 0);
+		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+		legendView.setLayoutParams(params);
+		legendView.setBackgroundResource(R.drawable.bg_legend);
+
 		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
 		ArrayList<LegendItem> legendItems = new ArrayList<LegendItem>();
@@ -356,12 +373,13 @@ public class LineChartControllerView extends View {
 		case MotionEvent.ACTION_DOWN:
 			if (isAnimating)
 				return false;
+			legendView.hideView();
 			mLastX = event.getX();
-			System.out.println("X= " + mLastX);
 			mDistanceX = mLastX - chart.getFirstX();
 			return true;
 		case MotionEvent.ACTION_UP:
-			break;
+			legendView.showView();
+			return true;
 		case MotionEvent.ACTION_MOVE:
 			xMove = event.getX();
 			startOffsetX = xMove - mDistanceX;
@@ -394,9 +412,9 @@ public class LineChartControllerView extends View {
 			chart.updateSeriesXMoveRight(startOffsetX);
 			return true;
 		default:
-			break;
+			legendView.showView();
+			return true;
 		}
-		return super.onTouchEvent(event);
 	}
 
 	private void regenChartConfig() {

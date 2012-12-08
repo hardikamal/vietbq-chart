@@ -3,13 +3,18 @@
 
     <string name="hello">Hello World, ChartAndroidActivity!</string>
     <string name="app_name">ChartAndroid</string>
-	<dimen name="distance_title_chart">30dp</dimen>
-	<dimen name="default_border_shader">1.5dp</dimen>
-	<dimen name="default_border_line">2dp</dimen>
-	<dimen name="default_speed">12dp</dimen>
-	<dimen name="defalut_font_size">14dp</dimen>
-	<dimen name="default_radius_node">14dp</dimen>
-	<dimen name="buffer_chart">5dp</dimen>
-	<dimen name="default_offset">5dp</dimen>
-	<dimen name="default_width_line">15dp</dimen>
+
+    <dimen name="distance_title_chart">30dp</dimen>
+    <dimen name="default_border_shader">1.5dp</dimen>
+    <dimen name="default_border_line">2dp</dimen>
+    <dimen name="default_speed">12dp</dimen>
+    <dimen name="defalut_font_size">14dp</dimen>
+    <dimen name="default_radius_node">14dp</dimen>
+    <dimen name="legend_radius">5dp</dimen>
+    <dimen name="buffer_chart">5dp</dimen>
+    <dimen name="default_offset">15dp</dimen>
+    <dimen name="default_width_line">38dp</dimen>
+    <dimen name="height_legend_view">25dp</dimen>
+	<dimen name="width_legend_view">43dp</dimen>
+	<dimen name="padding_legend_view">6dp</dimen>
 </resources>

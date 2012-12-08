@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.zoostudio.bean.CircleNodeData;
+import com.zoostudio.bean.LegendItem;
 import com.zoostudio.bean.LineData;
 import com.zoostudio.bean.MyColor;
 import com.zoostudio.bean.PaddingChart;
@@ -51,9 +52,11 @@ public class LineChartControllerView extends View {
 	private int mAction;
 	private float xMove;
 	private float startOffsetX;
+
 	/**
 	 * Khoang cach tu vi tri touch den diem cuoi cung cua truc X
 	 */
+
 	private float mDistanceX;
 	/**
 	 * Gia tri touch truoc do
@@ -71,17 +74,21 @@ public class LineChartControllerView extends View {
 	 * Bien de kiem tra qua trinh update lai du lieu truc X
 	 */
 	private boolean updateResuslt;
-	
+
 	/**
 	 * Bien su dung de kiem tra neu Animation dang chay thi khong the touch
 	 */
 	private volatile boolean isAnimating;
+	private LineLegendView legendView;
+	private ArrayList<String> legendTitles;
 
-	public LineChartControllerView(Context context){
+	public LineChartControllerView(Context context) {
 		super(context);
 	}
-	public LineChartControllerView(Context context, LineChart lineChart) {
+
+	public LineChartControllerView(Context context, LineChart lineChart,ArrayList<String> legendTitles) {
 		super(context);
+		this.legendTitles = legendTitles;
 		isAnimating = true;
 		chart = lineChart;
 		fontSize = getResources().getDimensionPixelOffset(
@@ -160,6 +167,7 @@ public class LineChartControllerView extends View {
 		}
 		chartConfig.paddingLeft = (float) Math.ceil(paddingLeft);
 	}
+
 	/**
 	 * Tinh gia tri start va end cua data khi draw <br>
 	 * Tinh ra tong so node cua truc X (So node hien thi duoc tren man hinh)
@@ -175,6 +183,7 @@ public class LineChartControllerView extends View {
 			mTotalNode = mEndOffset - (mStartOffset - 1);
 		}
 	}
+
 	/**
 	 * Lay ra danh sach cac diem tren truc X
 	 */
@@ -203,16 +212,19 @@ public class LineChartControllerView extends View {
 		}
 		chartConfig.paddingBottom = paddingBottom;
 	}
-	
 	/**
 	 * Khoi tao cac View de tao animation va cac View duong line chart
 	 */
 	private void genViewPieceLine() {
 		ArrayList<MyColor> colours = ColorUtil.getColorsByDefinded(
 				dataSeries.length, getContext());
+		legendView = new LineLegendView(getContext());
 		lineViews = new ArrayList<PathLineView>();
 		chartSeriesComponents = new ArrayList<ArrayList<ComponentChartView<?>>>();
+		ArrayList<LegendItem> legendItems = new ArrayList<LegendItem>();
 		for (int j = 0; j < dataSeries.length; j++) {
+			legendItems.add(new LegendItem(legendTitles.get(j), colours.get(j)
+					.getColor()));
 			ArrayList<LineData> chartData = dataSeries[j];
 			PathLineView lineView = new PathLineView(getContext(),
 					colours.get(j));
@@ -280,6 +292,7 @@ public class LineChartControllerView extends View {
 			chartSeriesComponents.add(arrayComponents);
 			lineViews.add(lineView);
 		}
+		legendView.setData(legendItems);
 		backgroundView = new LineChartBackgroundView(getContext(), Color.GRAY);
 		backgroundView.setConfig(chartConfig, mNumberLine);
 	}
@@ -411,8 +424,13 @@ public class LineChartControllerView extends View {
 	public LineChartBackgroundView getBackgroundView() {
 		return backgroundView;
 	}
-	
-	public void finishAnimate(){
+
+	public void finishAnimate() {
 		isAnimating = false;
 	}
+
+	public LineLegendView getLegendView() {
+		return legendView;
+	}
+
 }

@@ -4,7 +4,7 @@ public class LineData extends ChartData {
 	private float value;
 	private String title;
 	private int mColor;
-
+	
 	public float getValue() {
 		return value;
 	}
